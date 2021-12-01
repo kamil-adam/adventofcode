@@ -105,6 +105,7 @@ library
   hs-source-dirs:      hs/src
   exposed-modules:
     Day1
+    Day2
   build-depends:
       split
 --    , containers           == 0.6.2.1
