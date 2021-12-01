@@ -1,9 +1,9 @@
-module Day1 where
+module Day2 where
 
 import           Data.List.Split
 
-day1 :: IO ()
-day1 = do
+day2 :: IO ()
+day2 = do
   content <- readFileText "input/day1"
   putTextLn $ show $ bbb content
 
