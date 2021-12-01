@@ -5,14 +5,23 @@ import           Data.List.Split
 day1 :: IO ()
 day1 = do
   content <- readFileText "input/day1"
-  putTextLn $ show $ aaa content
+  putTextLn $ show $ bbb content
 
+bbb :: Text -> Int
+bbb s = length $ filter increased $ divvy2 $ sum3 <$> divvy3 (readInt <$> lines s)
 
 aaa :: Text -> Int
 aaa s = length $ filter increased $ divvy2 $ readInt <$> lines s
 
 readInt :: Text -> Int
 readInt = readUnsafe
+
+divvy3 :: [Int] -> [[Int]]
+divvy3 = divvy 3 1
+
+sum3 :: [Int] -> Int
+sum3 (a : b : c : _) = a + b + c
+sum3 l               = error $ show l
 
 divvy2 :: [Int] -> [[Int]]
 divvy2 = divvy 2 1

@@ -19,6 +19,7 @@ clean:
 	if test -d .cabal-sandbox; then cabal sandbox delete; fi
 	if test -d .hpc; then rm -r .hpc; fi
 	if test -d .hie; then rm -r .hie; fi
+	rm -f aoc.tix
 
 configure:
 	rm -f cabal.project.local*
@@ -40,6 +41,7 @@ report:
 	make haddock stan hlint
 
 run:
+	rm -f aoc.tix
 	cabal new-run --jobs aoc
 
 stan:
