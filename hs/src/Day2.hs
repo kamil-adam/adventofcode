@@ -5,30 +5,27 @@ import           Data.List.Split
 day2 :: IO ()
 day2 = do
   content <- readFileText "input/day1"
-  putTextLn $ show $ bbb content
-
-bbb :: Text -> Int
-bbb s = length $ filter increased $ divvy2 $ sum3 <$> divvy3 (readInt <$> lines s)
+  putTextLn $ show $ aaa content
 
 aaa :: Text -> Int
-aaa s = length $ filter increased $ divvy2 $ readInt <$> lines s
+aaa s = productPair $ sumList $ commend <$> words <$> lines s
+
+commend :: [Text] -> (Int , Int)
+commend ("farward" : a : _) = (readInt a , 0)
+commend ("up" : a : _)      = (0 , readInt a)
+commend ("down" : a : _)    = (0 , negate (readInt a))
+
+sumList :: [(Int , Int)] -> (Int , Int)
+sumList = fold sum2
+
+sum2 :: (Int , Int) -> (Int , Int) -> (Int , Int)
+sum (a , b) (c , d) = (a + c , b + d)
+
+productPair :: (Int , Int) -> Int
+productPair (a , b) = a * b
 
 readInt :: Text -> Int
 readInt = readUnsafe
-
-divvy3 :: [Int] -> [[Int]]
-divvy3 = divvy 3 1
-
-sum3 :: [Int] -> Int
-sum3 (a : b : c : _) = a + b + c
-sum3 l               = error $ show l
-
-divvy2 :: [Int] -> [[Int]]
-divvy2 = divvy 2 1
-
-increased :: [Int] -> Bool
-increased (a : b : _) = a < b
-increased l           = error $ show l
 
 readUnsafe :: Read a => Text -> a
 readUnsafe = unsafe . readEither . toString where
