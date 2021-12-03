@@ -1,4 +1,4 @@
-module Day3 where
+module Day4 where
 
 import           Relude.Unsafe
 
