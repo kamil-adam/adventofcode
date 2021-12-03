@@ -37,7 +37,7 @@ common common-options
     , relude               == 1.0.0.1
   mixins:
       base hiding (Prelude)
-    , relude (Relude as Prelude, Relude.Extra, Data.Text)
+    , relude (Relude as Prelude, Relude.Extra, Data.Text, Relude.Unsafe)
   default-language:    Haskell2010
   default-extensions:
     EmptyDataDecls
@@ -106,6 +106,7 @@ library
   exposed-modules:
     Day1
     Day2
+    Day3
   build-depends:
       split
 --    , containers           == 0.6.2.1
