@@ -2,14 +2,25 @@ module Day2 where
 
 day3 :: IO ()
 day3 = do
-  content <- readFileText "input/input2"
+  content <- readFileText "input/input3"
   putTextLn $ show $ aaa content
 
-aaa :: Text -> Int
-aaa s = productPair3 $ sumList $ commend . words <$> lines s
+run :: Text -> [Bool]
+run s = ccc <$> transpose $ aaa <$> lines s
 
---commandList :: [Text] -> (Int , Int)
---commandList l = commend !!
+count :: [Text] -> Int
+count l = length l
+
+aaa :: Text -> [Bool]
+aaa l = bbb <$> toString l
+
+bbb :: Char -> Bool
+bbb '0' = False
+bbb '1' = True
+bbb  c  = error $ show c
+
+ccc :: [Bool] -> Bool
+ccc l = 1/2 <= (length $ filter id l)/(length l)
 
 commend :: [Text] -> (Int , Int)
 commend ["forward" , a] = (readInt a , 0)
@@ -34,6 +45,20 @@ productPair3 (a , b , _) = a * b
 productPair :: (Int , Int) -> Int
 productPair (a , b) = a * b
 
+----
+
+transpose :: [[a]] -> [[a]]
+transpose = getZipList . traverse ZipList
+
+newtype ZipList a = ZipList { getZipList :: [a] }
+
+instance Applicative ZipList where
+    pure x = ZipList (repeat x)
+    ZipList fs <*> ZipList xs = ZipList (zipWith ($) fs xs)
+
+
+------
+
 readInt :: Text -> Int
 readInt = readUnsafe
 
@@ -41,3 +66,4 @@ readUnsafe :: Read a => Text -> a
 readUnsafe = unsafe . readEither . toString where
   unsafe (Right a) = a
   unsafe (Left a)  = error a
+
