@@ -5,6 +5,7 @@ import           Relude.Unsafe
 day3 :: IO ()
 day3 = do
   content <- readFileText "input/input3"
+--  content <- readFileText "input/i3"
   putTextLn $ show $ run2 content
 
 run :: Text -> [Bool]
@@ -15,7 +16,16 @@ run2 s = aaa3 $ (aaa <$> lines s)
 
 -- [False,True,False,False,True,False,False,False,True,False,False,False]
 --010010001000 = 1160
+--[False,True,False,False,True,False,False,False,True,False,False,True]
+--010010001001 = 1161
 
+-- True,True,True,False,False,False,True,False,True,False,True,True]
+--111000101011 = 3627
+--[True,True,True,False,False,False,True,False,False,True,False,True]
+--111000100101 = 3621
+
+-- 10111 - [True,False,True,True,False]
+-- 01010 - [False,True,False,True,False]
 
 aaa3 :: [[Bool]] -> [Bool]
 aaa3 l
@@ -31,7 +41,7 @@ aaa4 i l
 filterList :: Int -> [[Bool]] -> [[Bool]]
 filterList i l
   | 1 == (length l) = l
-  | i < (length $ index2 "filterList" l 0) = filter (\al -> (index2 "filterList" al i) == (notCCC $ bbb2 i <$> l)) l
+  | i < (length $ index2 "filterList" l 0) = filter (\al -> (index2 "filterList" al i) == (notCCC1 $ bbb2 i <$> l)) l
   | otherwise = error $ show i <> show l
 
 
@@ -59,8 +69,14 @@ bbb '0' = False
 bbb '1' = True
 bbb  c  = error $ show c
 
+notCCC1 :: [Bool] -> Bool
+notCCC1 = not . ccc1
+
 notCCC :: [Bool] -> Bool
 notCCC = not . ccc
+
+ccc1 :: [Bool] -> Bool
+ccc1 l = (2 * length (filter id l)) < length l
 
 ccc :: [Bool] -> Bool
 ccc l = (2 * length (filter id l)) <= length l
