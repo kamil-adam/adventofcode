@@ -4,12 +4,12 @@ import           Relude.Unsafe
 
 day4 :: IO ()
 day4 = do
---  content <- readFileText "input/i4"
-  content <- readFileText "input/input4"
-  putTextLn $ show $ run2 content
+  content <- readFileText "input/i4"
+--  content <- readFileText "input/input4"
+  putTextLn $ show $ run1 content
 
-run :: Text -> [Bool]
-run s = ccc <$> transpose2 (aaa <$> lines s)
+run1 :: Text -> [Bool]
+run1 s = ccc <$> transpose2 (aaa <$> lines s)
 
 run2 :: Text -> [Bool]
 run2 s = aaa3 $ (aaa <$> lines s)
