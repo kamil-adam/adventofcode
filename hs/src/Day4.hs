@@ -16,15 +16,16 @@ day4 = do
 --  content <- readFileText "input/input4"
   putTextLn $ show $ run1 content
 
-run1 :: Text -> Maybe Int
+run1 :: Text -> (Maybe Int , Maybe Int)
 run1 s = (aaa $ lines s)
 
-aaa :: [Text] -> Maybe Int
+aaa :: [Text] -> (Maybe Int , Maybe Int)
 aaa (numbers : _ : a) = bbb (readInt <$> (T.splitOn "," numbers)) ((map (map (Right . readInt))) <$> (map words) <$> lines <$> toText <$>  (T.splitOn "\n\n" $ unlines a))
 aaa t = error $ show t
 
-bbb :: [Int] -> [Board] -> Maybe Int
-bbb numbers boards = eee <$> (find checkBoard $ ccc numbers boards)
+bbb :: [Int] -> [Board] -> (Maybe Int , Maybe Int)
+bbb numbers boards = (number , eee <$> (find checkBoard $ reverse $ checked))
+  where (number , checked) = ccc numbers boards
 
 eee :: Board -> Int
 eee board = sum $ ggg <$> filter isRight (id =<< board)
@@ -37,12 +38,12 @@ ggg :: Cell -> Int
 ggg (Right i) = i
 ggg (Left i) = error $ show i
 
-ccc :: [Int] -> [Board] -> [Board]
-ccc [] boards = boards
-ccc (x : xs) boards = ddd xs (markCellInBoards x boards)
+ccc :: [Int] -> [Board] -> (Maybe Int , [Board])
+ccc [] boards = (Nothing , boards)
+ccc (x : xs) boards =  ddd x xs (markCellInBoards x boards)
 
-ddd :: [Int] -> [Board] -> [Board]
-ddd xs boards =  if any id (checkBoards boards) then boards else ccc xs boards
+ddd :: Int -> [Int] -> [Board] -> (Maybe Int , [Board] , [Board])
+ddd x xs boards =  if any id (checkBoards boards) then ((Just x) , boards) else ccc xs boards
 
 markCellInBoards :: Int -> [Board] -> [Board]
 markCellInBoards i = map (markCellInBoard i)
