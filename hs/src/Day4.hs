@@ -1,8 +1,14 @@
+--{-# LANGUAGE BangPatterns, CPP, MagicHash, Rank2Types, UnboxedTuples, TypeFamilies #-}
+--{-# LANGUAGE TemplateHaskellQuotes #-}
+--{-# LANGUAGE Trustworthy #-}
+
 module Day4 where
 
-import           Relude.Unsafe
+--import           Relude.Unsafe
 
-import Data.List.Split
+--import           Data.List.Split
+
+import qualified Data.Text as T
 
 day4 :: IO ()
 day4 = do
@@ -10,121 +16,65 @@ day4 = do
 --  content <- readFileText "input/input4"
   putTextLn $ show $ run1 content
 
-run1 :: Text -> [Bool]
-run1  = ccc <$> transpose2 (aaa <$> lines s)
+run1 :: Text -> Maybe Int
+run1 s = (aaa $ lines s)
 
-aaa :: [Text] -> Int
-aaa (numbers : _ : a) = bbb (readInt <$> (splitOn "," numbers)) ( words $ lines $ splitOn "\n\n" $ unlines a)
+aaa :: [Text] -> Maybe Int
+aaa (numbers : _ : a) = bbb (readInt <$> (T.splitOn "," numbers)) ((map (map (Right . readInt))) <$> (map words) <$> lines <$> toText <$>  (T.splitOn "\n\n" $ unlines a))
+aaa t = error $ show t
 
-bbb :: [Int] -> [[Text]] -> Int
-bbb numbers boards = 1
+bbb :: [Int] -> [Board] -> Maybe Int
+bbb numbers boards = eee <$> (find checkBoard $ ccc numbers boards)
 
+eee :: Board -> Int
+eee board = sum $ ggg <$> filter isRight (id =<< board)
 
+fff :: Cell -> Int
+fff (Left i) = i
+fff (Right i) = error $ show i
 
-run2 :: Text -> [Bool]
-run2 s = aaa3 $ (aaa <$> lines s)
+ggg :: Cell -> Int
+ggg (Right i) = i
+ggg (Left i) = error $ show i
 
--- [False,True,False,False,True,False,False,False,True,False,False,False]
---010010001000 = 1160
---[False,True,False,False,True,False,False,False,True,False,False,True]
---010010001001 = 1161
+ccc :: [Int] -> [Board] -> [Board]
+ccc [] boards = boards
+ccc (x : xs) boards = ddd xs (markCellInBoards x boards)
 
--- True,True,True,False,False,False,True,False,True,False,True,True]
---111000101011 = 3627
---[True,True,True,False,False,False,True,False,False,True,False,True]
---111000100101 = 3621
+ddd :: [Int] -> [Board] -> [Board]
+ddd xs boards =  if any id (checkBoards boards) then boards else ccc xs boards
 
--- 10111 - [True,False,True,True,False]
--- 01010 - [False,True,False,True,False]
+markCellInBoards :: Int -> [Board] -> [Board]
+markCellInBoards i = map (markCellInBoard i)
 
-aaa3 :: [[Bool]] -> [Bool]
-aaa3 l
-  | 0 < length l = index2 "aaa3" (aaa4 0 l) 0
-  | otherwise = error "empty list"
+markCellInBoard :: Int -> Board -> Board
+markCellInBoard i = map (markCellInLine i)
 
-aaa4 :: Int -> [[Bool]] -> [[Bool]]
-aaa4 i l
-  | 1 == (length l) = l
-  | i < (length $ index2 "aaa4" l 0) = aaa4 (i + 1) (filterList i l)
-  | otherwise = l
+markCellInLine :: Int -> [Cell] -> [Cell]
+markCellInLine i = map (markCell i)
 
-filterList :: Int -> [[Bool]] -> [[Bool]]
-filterList i l
-  | 1 == (length l) = l
-  | i < (length $ index2 "filterList" l 0) = filter (\al -> (index2 "filterList" al i) == (notCCC1 $ bbb2 i <$> l)) l
-  | otherwise = error $ show i <> show l
+markCell :: Int -> Cell -> Cell
+markCell i c = do
+  c' <- c
+  if i == c' then (Left c') else c
 
 
+checkBoards :: [Board] -> [Bool]
+checkBoards = map checkBoard
 
-bbb2 :: Int -> [Bool] -> Bool
-bbb2 i l = l !! i
+checkBoard :: Board -> Bool
+checkBoard board = (checkBoard' board) || (checkBoard' $ transpose2 board)
 
+checkBoard' :: Board -> Bool
+checkBoard' board = any (\line -> all  (\ cell -> isLeft cell) line) board
 
-index2:: (Show a) => Text -> [a] -> Int -> a
-index2 s l i
-  | 0 < length l = l !! i
-  | otherwise = error $ show s <> " " <> show i <> " " <> show l
+type Board = [[Cell]]
+type Cell = Either Int Int
 
-
-
---111001011100 = 3676
---000110100011 = 419
---1540244
-
-aaa :: Text -> [Bool]
-aaa l = bbb <$> toString l
-
-bbb :: Char -> Bool
-bbb '0' = False
-bbb '1' = True
-bbb  c  = error $ show c
-
-notCCC1 :: [Bool] -> Bool
-notCCC1 = not . ccc1
-
-notCCC :: [Bool] -> Bool
-notCCC = not . ccc
-
-ccc1 :: [Bool] -> Bool
-ccc1 l = (2 * length (filter id l)) < length l
-
-ccc :: [Bool] -> Bool
-ccc l = (2 * length (filter id l)) <= length l
-
-commend :: [Text] -> (Int , Int)
-commend ["forward" , a] = (readInt a , 0)
-commend ["up"      , a] = (0 , negate $ readInt a)
-commend ["down"    , a] = (0 , readInt a)
-commend c               = error $ show c
-
-sumList :: [(Int , Int)] -> (Int , Int , Int)
---sumList = fold sum2
---sumList = foldr sum2 (0 , 0) -- (forward , depth)
-sumList = foldl' sum3 (0 , 0 , 0) -- (forward , depth , aim)
-
-sum3 :: (Int , Int , Int) -> (Int , Int) -> (Int , Int , Int)
-sum3  (b1 , b2 , b3) (a1 , a2) = ( b1 + a1 , b2 + (b3 * a1) ,  b3 + a2)
-
-sum2 :: (Int , Int) -> (Int , Int) -> (Int , Int)
-sum2 (a , b) (c , d) = (a + c , b + d)
-
-productPair3 :: (Int , Int , Int) -> Int
-productPair3 (a , b , _) = a * b
-
-productPair :: (Int , Int) -> Int
-productPair (a , b) = a * b
-
-----
+------
 
 transpose2 :: [[a]] -> [[a]]
 transpose2 = getZipList . traverse ZipList
-
---newtype ZipList a = ZipList { getZipList :: [a] }
---
---instance Applicative ZipList where
---    pure x = ZipList (repeat x)
---    ZipList fs <*> ZipList xs = ZipList (zipWith ($) fs xs)
-
 
 ------
 

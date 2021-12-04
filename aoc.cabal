@@ -110,6 +110,7 @@ library
     Day4
   build-depends:
       split
+    , text
 --    , containers           == 0.6.2.1
 --    , data-default
 --    , dlist
