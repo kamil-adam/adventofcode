@@ -2,6 +2,8 @@ module Day4 where
 
 import           Relude.Unsafe
 
+import Data.List.Split
+
 day4 :: IO ()
 day4 = do
   content <- readFileText "input/i4"
@@ -9,7 +11,15 @@ day4 = do
   putTextLn $ show $ run1 content
 
 run1 :: Text -> [Bool]
-run1 s = ccc <$> transpose2 (aaa <$> lines s)
+run1  = ccc <$> transpose2 (aaa <$> lines s)
+
+aaa :: [Text] -> Int
+aaa (numbers : _ : a) = bbb (readInt <$> (splitOn "," numbers)) ( words $ lines $ splitOn "\n\n" $ unlines a)
+
+bbb :: [Int] -> [[Text]] -> Int
+bbb numbers boards = 1
+
+
 
 run2 :: Text -> [Bool]
 run2 s = aaa3 $ (aaa <$> lines s)
