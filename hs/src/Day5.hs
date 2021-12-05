@@ -39,13 +39,13 @@ points :: Line -> [Point]
 points ((x1 , y1) , (x2 , y2))
   | x1 == x2 = (\ y -> (x1 , y)) <$> (range y1 y2)
   | y1 == y2 = (\ x -> (x , y1)) <$> (range x1 x2)
-  | otherwise = []
+  | otherwise = zip (range x1 x2) (range y1 y2)
 --points l = error $ "points " <> show l
 
 range :: Int -> Int -> [Int]
 range z1 z2
   | z1 <= z2  = [z1 .. z2]
-  | otherwise = [z2 .. z1]
+  | otherwise = reverse [z2 .. z1]
 
 splitOnA :: Text -> [Text]
 splitOnA t = T.splitOn " -> " t
