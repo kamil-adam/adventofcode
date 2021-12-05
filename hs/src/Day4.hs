@@ -4,7 +4,7 @@
 
 module Day4 where
 
---import           Relude.Unsafe
+--import qualified          Relude.Unsafe as Unsafe
 
 --import           Data.List.Split
 
@@ -12,20 +12,20 @@ import qualified Data.Text as T
 
 day4 :: IO ()
 day4 = do
-  content <- readFileText "input/i4"
---  content <- readFileText "input/input4"
+--  content <- readFileText "input/i4"
+  content <- readFileText "input/input4"
   putTextLn $ show $ run1 content
 
-run1 :: Text -> (Maybe Int , Maybe Int)
+run1 :: Text -> [(Maybe Int, [Int])]
 run1 s = (aaa $ lines s)
 
-aaa :: [Text] -> (Maybe Int , Maybe Int)
+aaa :: [Text] -> [(Maybe Int, [Int])]
 aaa (numbers : _ : a) = bbb (readInt <$> (T.splitOn "," numbers)) ((map (map (Right . readInt))) <$> (map words) <$> lines <$> toText <$>  (T.splitOn "\n\n" $ unlines a))
 aaa t = error $ show t
 
-bbb :: [Int] -> [Board] -> (Maybe Int , Maybe Int)
-bbb numbers boards = (number , eee <$> (find checkBoard $ reverse $ checked))
-  where (number , checked) = ccc numbers boards
+bbb :: [Int] -> [Board] -> [(Maybe Int, [Int])]
+bbb numbers boards = (\ ( a , b ) -> (a , eee <$> b) )<$> ccc2 numbers boards
+
 
 eee :: Board -> Int
 eee board = sum $ ggg <$> filter isRight (id =<< board)
@@ -38,12 +38,21 @@ ggg :: Cell -> Int
 ggg (Right i) = i
 ggg (Left i) = error $ show i
 
-ccc :: [Int] -> [Board] -> (Maybe Int , [Board])
-ccc [] boards = (Nothing , boards)
-ccc (x : xs) boards =  ddd x xs (markCellInBoards x boards)
+--ccc :: [Int] -> [Board] -> (Maybe Int , [Board])
+--ccc [] boards = (Nothing , boards)
+--ccc (x : xs) boards =  ddd x xs (markCellInBoards x boards)
 
-ddd :: Int -> [Int] -> [Board] -> (Maybe Int , [Board] , [Board])
-ddd x xs boards =  if any id (checkBoards boards) then ((Just x) , boards) else ccc xs boards
+ccc2 :: [Int] -> [Board] -> [(Maybe Int , [Board])]
+ccc2 [] boards = [(Nothing , boards)]
+ccc2 (x : xs) boards = ddd2 x xs (markCellInBoards x boards)
+
+--ddd :: Int -> [Int] -> [Board] -> (Maybe Int , [Board])
+--ddd x xs boards =  if any id (checkBoards boards) then ((Just x) , boards) else ccc xs boards
+
+ddd2 :: Int -> [Int] -> [Board] -> [(Maybe Int , [Board])]
+ddd2 x xs boards = [((Just x) , filter checkBoard boards)]  ++  (ccc2 xs $ filter (not . checkBoard) boards)
+
+--last' l =
 
 markCellInBoards :: Int -> [Board] -> [Board]
 markCellInBoards i = map (markCellInBoard i)
