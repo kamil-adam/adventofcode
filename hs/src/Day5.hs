@@ -8,24 +8,44 @@ module Day5 where
 
 --import           Data.List.Split
 
+import qualified Data.Map as Map
+
 import qualified Data.Text as T
 
 day5 :: IO ()
 day5 = do
-  content <- readFileText "input/i5"
---  content <- readFileText "input/input5"
-  putTextLn $ show $ run1 content
+--  content <- readFileText "input/i5"
+  content <- readFileText "input/input5"
+  putTextLn $ "day 5 " <> (show $ run1 content)
 
-run1 :: Text -> [Line]
+run1 :: Text -> Int
 --run1 t = filter (\ ((x1 , y1) , (x2 , y2)) -> x1 == x2 || y1 == y2) b
 --  where b = aaa <$> lines t
+run1 t = length $ filter (\ (_, i) -> 2 <= i) $ frePoints t
 
-run1 t = l
-where l= aaa <$> lines t
+frePoints :: Text -> [(Point, Int)]
+frePoints  t = frequency $ allPoints t
+
+
+
+allPoints :: Text -> [Point]
+allPoints t = points =<< ((aaa <$> lines t))
 
 aaa :: Text -> Line
 --aaa t = intList <$> splitOnC <$> T.splitOn " -> " t
 aaa t = bbb $ intList <$> splitOnC <$> splitOnA t
+
+points :: Line -> [Point]
+points ((x1 , y1) , (x2 , y2))
+  | x1 == x2 = (\ y -> (x1 , y)) <$> (range y1 y2)
+  | y1 == y2 = (\ x -> (x , y1)) <$> (range x1 x2)
+  | otherwise = []
+--points l = error $ "points " <> show l
+
+range :: Int -> Int -> [Int]
+range z1 z2
+  | z1 <= z2  = [z1 .. z2]
+  | otherwise = [z2 .. z1]
 
 splitOnA :: Text -> [Text]
 splitOnA t = T.splitOn " -> " t
@@ -90,6 +110,11 @@ type Cell = Either Int Int
 
 ------
 
+frequency :: (Ord a) => [a] -> [(a, Int)]
+frequency xs = Map.toList (Map.fromListWith (+) [(x, 1) | x <- xs])
+
+------
+
 transpose2 :: [[a]] -> [[a]]
 transpose2 = getZipList . traverse ZipList
 
@@ -103,3 +128,4 @@ readUnsafe t = (unsafe . readEither . toString) t where
   unsafe (Right a) = a
   unsafe (Left a)  = error $ a <> " " <> toText t
 
+----

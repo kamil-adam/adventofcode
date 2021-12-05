@@ -112,7 +112,7 @@ library
   build-depends:
       split
     , text
---    , containers           == 0.6.2.1
+    , containers           == 0.6.2.1
 --    , data-default
 --    , dlist
 --    , ilist
