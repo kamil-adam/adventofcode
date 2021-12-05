@@ -104,10 +104,11 @@ library
   import:              common-options
   hs-source-dirs:      hs/src
   exposed-modules:
-    Day1
-    Day2
-    Day3
-    Day4
+--    Day1
+--    Day2
+--    Day3
+--    Day4
+    Day5
   build-depends:
       split
     , text
