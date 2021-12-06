@@ -16,8 +16,63 @@ day6 :: IO ()
 day6 = do
 --  content <- readFileText "input/i6"
   content <- readFileText "input/input6"
---  putTextLn $ "day 6 " <> (show $ run1 content)
-  putTextLn $ "day 6 " <> (show $ length $ run1 content)
+--  putTextLn $ "day 6 " <> (show $ run3 content)
+  putTextLn $ "day 6 " <> (show $ sum3 $ run3 content)
+--  putTextLn $ "day 6 " <> (show $ length $ run1 content)
+
+type Element = (Int , Int)
+
+type Result3 = [Element]
+
+sum3 :: Result3 -> Int
+sum3 r = sum $ ((\ (_, s) -> s) <$> r)
+
+run3 :: Text -> Result3
+run3 t = aaa3 $ lines t
+
+aaa3 :: [Text] -> Result3
+aaa3 [t] = bbb3 t
+aaa3 t = error $ show t
+
+bbb3 :: Text -> Result3
+bbb3 t = nextDay3 0 256 $ frequency (readInt <$> T.splitOn "," t)
+
+nextDay3 :: Int -> Int -> Result3 -> Result3
+nextDay3 current expected values
+  | current == expected = values
+  | otherwise           = nextDay3 (current + 1) expected (l ++ [(8 , n)])  where
+    (l , n) = foldr nextDayBody3 ([] , 0) values
+
+nextDayBody3 :: Element -> (Result3, Int) -> (Result3, Int)
+nextDayBody3 (0 , s) (l , n) = (([(6    , s)] <> l) , n + s)
+nextDayBody3 (e , s) (l , n) = (([(e - 1, s)] <> l) , n)
+
+
+----
+
+--type Result3 = Map Int Int
+--
+--run2 :: Text -> Result3
+--run2 t = aaa2 $ lines t
+--
+--aaa2 :: [Text] -> Result3
+--aaa2 [t] = bbb2 t
+--aaa2 t = error $ show t
+--
+--bbb2 :: Text -> Result3
+--bbb2 t = nextDay2 0 80 $ frequency0 (readInt <$> T.splitOn "," t)
+--
+--nextDay2 :: Int -> Int -> Result3 -> Result3
+--nextDay2 current expected values
+--  | current == expected = values
+--  | otherwise           = nextDay2 (current + 1) expected (Map.insert 8 n l) where
+--    (l , n) = Map.foldr nextDayBody2 (Map.fromList [] , 0) values
+--
+--nextDayBody2 :: (Int, Int) -> (Result3 , Int) -> (Result3, Int)
+--nextDayBody2 (0 , s) (l , n) = ((Map.insert 6 s l) , n + s)
+--nextDayBody2 (e , s) (l , n) = ((Map.insert (e - 1) s l) , n)
+
+----
 
 run1 :: Text ->  [Int]
 run1 t = aaa $ lines t
@@ -47,61 +102,19 @@ range z1 z2
   | z1 <= z2  = [z1 .. z2]
   | otherwise = reverse [z2 .. z1]
 
-splitOnA :: Text -> [Text]
-splitOnA t = T.splitOn " -> " t
-
-splitOnC :: Text -> [Text]
-splitOnC t = T.splitOn "," t
-
-intList :: [Text] -> [Int]
-intList l = readInt <$> l
-
---ccc <$> chunksOf 4 $
-
-
-type Line = (Point , Point)
-type Point = (Int , Int)
 
 
 
 
-
-
-
-
-
-
-markCellInBoards :: Int -> [Board] -> [Board]
-markCellInBoards i = map (markCellInBoard i)
-
-markCellInBoard :: Int -> Board -> Board
-markCellInBoard i = map (markCellInLine i)
-
-markCellInLine :: Int -> [Cell] -> [Cell]
-markCellInLine i = map (markCell i)
-
-markCell :: Int -> Cell -> Cell
-markCell i c = do
-  c' <- c
-  if i == c' then (Left c') else c
-
-
-checkBoards :: [Board] -> [Bool]
-checkBoards = map checkBoard
-
-checkBoard :: Board -> Bool
-checkBoard board = (checkBoard' board) || (checkBoard' $ transpose2 board)
-
-checkBoard' :: Board -> Bool
-checkBoard' board = any (\line -> all  (\ cell -> isLeft cell) line) board
-
-type Board = [[Cell]]
-type Cell = Either Int Int
 
 ------
 
 frequency :: (Ord a) => [a] -> [(a, Int)]
 frequency xs = Map.toList (Map.fromListWith (+) [(x, 1) | x <- xs])
+
+frequency0 :: (Ord a) => [a] -> Map a Int
+frequency0 xs = (Map.fromListWith (+) [(x, 1) | x <- xs])
+
 
 ------
 
