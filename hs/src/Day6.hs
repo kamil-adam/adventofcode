@@ -16,8 +16,8 @@ day6 :: IO ()
 day6 = do
 --  content <- readFileText "input/i6"
   content <- readFileText "input/input6"
---  putTextLn $ "day 5 " <> (show $ run1 content)
-  putTextLn $ "day 5 " <> (show $ length $ run1 content)
+--  putTextLn $ "day 6 " <> (show $ run1 content)
+  putTextLn $ "day 6 " <> (show $ length $ run1 content)
 
 run1 :: Text ->  [Int]
 run1 t = aaa $ lines t
