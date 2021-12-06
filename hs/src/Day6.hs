@@ -14,33 +14,33 @@ import qualified Data.Text as T
 
 day6 :: IO ()
 day6 = do
---  content <- readFileText "input/i5"
-  content <- readFileText "input/input5"
-  putTextLn $ "day 5 " <> (show $ run1 content)
+--  content <- readFileText "input/i6"
+  content <- readFileText "input/input6"
+--  putTextLn $ "day 5 " <> (show $ run1 content)
+  putTextLn $ "day 5 " <> (show $ length $ run1 content)
 
-run1 :: Text -> Int
---run1 t = filter (\ ((x1 , y1) , (x2 , y2)) -> x1 == x2 || y1 == y2) b
---  where b = aaa <$> lines t
-run1 t = length $ filter (\ (_, i) -> 2 <= i) $ frePoints t
+run1 :: Text ->  [Int]
+run1 t = aaa $ lines t
 
-frePoints :: Text -> [(Point, Int)]
-frePoints  t = frequency $ allPoints t
+aaa :: [Text] ->  [Int]
+aaa [t] = bbb t
+aaa t = error $ show t
 
+bbb :: Text ->  [Int]
+bbb t = nextDay 0 80 (readInt <$> T.splitOn "," t)
 
+nextDay :: Int -> Int -> [Int] -> [Int]
+nextDay current expected values
+  | current == expected = values
+  | otherwise           = nextDay (current + 1) expected ((reverse l) ++ (newFish n ))  where
+    (l , n) = foldr  nextDayBody ([] , 0) values
 
-allPoints :: Text -> [Point]
-allPoints t = points =<< ((aaa <$> lines t))
+nextDayBody :: Int -> ([Int], Int) -> ([Int], Int)
+nextDayBody 0 (l , n) = (l <> [6]       , n + 1)
+nextDayBody e (l , n) = (l <> [(e - 1)] , n)
 
-aaa :: Text -> Line
---aaa t = intList <$> splitOnC <$> T.splitOn " -> " t
-aaa t = bbb $ intList <$> splitOnC <$> splitOnA t
-
-points :: Line -> [Point]
-points ((x1 , y1) , (x2 , y2))
-  | x1 == x2 = (\ y -> (x1 , y)) <$> (range y1 y2)
-  | y1 == y2 = (\ x -> (x , y1)) <$> (range x1 x2)
-  | otherwise = zip (range x1 x2) (range y1 y2)
---points l = error $ "points " <> show l
+newFish :: Int -> [Int]
+newFish n = (\ _ -> 8) <$> [1 .. n]
 
 range :: Int -> Int -> [Int]
 range z1 z2
@@ -58,16 +58,6 @@ intList l = readInt <$> l
 
 --ccc <$> chunksOf 4 $
 
-
-
-bbb :: [[Int]] -> Line
-bbb [[x1 , y1], [x2 , y2]] = ((x1 , y1) , (x2 , y2))
---bbb [[x1 , y1 , x2 , y2]] = ((x1 , y1) , (x2 , y2))
-bbb t = error $ "[[x1 , y1], [x2 , y2]] " <> show t
-
-ccc :: [Int] -> Line
-ccc [x1 , y1 , x2 , y2] = ((x1 , y1) , (x2 , y2))
-ccc t = error $ "[x1 , y1, x2 , y2] " <> show t
 
 type Line = (Point , Point)
 type Point = (Int , Int)
