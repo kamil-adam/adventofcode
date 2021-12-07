@@ -2,7 +2,7 @@
 --{-# LANGUAGE TemplateHaskellQuotes #-}
 --{-# LANGUAGE Trustworthy #-}
 
-module Day7 where
+module Day8 where
 
 --import qualified          Relude.Unsafe as Unsafe
 
@@ -13,8 +13,8 @@ import qualified Data.Map as Map
 import qualified Data.List as L
 import qualified Data.Text as T
 
-day7 :: IO ()
-day7 = do
+day8 :: IO ()
+day8 = do
 --  content <- readFileText "input/i7"
   content <- readFileText "input/input7"
   putTextLn $ "day 7 " <> (show $ run content)
