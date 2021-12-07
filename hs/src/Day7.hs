@@ -10,16 +10,33 @@ module Day7 where
 
 import qualified Data.Map as Map
 
+import qualified Data.List as L
 import qualified Data.Text as T
 
 day7 :: IO ()
 day7 = do
 --  content <- readFileText "input/i7"
   content <- readFileText "input/input7"
-  putTextLn $ "day 7 " <> (show $ run3 content)
---  putTextLn $ "day 7 " <> (show $ sum3 $ run3 content)
---  putTextLn $ "day 7 " <> (show $ length $ run1 content)
+  putTextLn $ "day 7 " <> (show $ run content)
 
+run :: Text -> (Int , Int)
+run t = minForTuple $ (\i -> aaa i positions) <$> [(L.minimum positions) .. (L.maximum positions)]
+--run t = (\i -> aaa i positions) <$> [(L.minimum positions) .. (L.maximum positions)]
+  where positions = readInt <$> T.splitOn "," t
+
+minForTuple :: [(Int , Int)] -> (Int , Int)
+minForTuple l = L.foldl1 bbb l
+
+bbb :: (Int , Int) -> (Int , Int) -> (Int , Int)
+bbb (k1 , v1) (k2 , v2)
+  | v1 <= v2  = (k1 , v1)
+  | otherwise = (k2 , v2)
+
+aaa :: Int -> [Int] -> (Int , Int)
+aaa i l = (i , sum $ normalize i l)
+
+normalize :: Int -> [Int] -> [Int]
+normalize i l = (\ i' -> abs $ i' - i) <$> l
 
 ------
 
