@@ -15,9 +15,9 @@ import qualified Data.Text as T
 
 day8 :: IO ()
 day8 = do
---  content <- readFileText "input/i7"
-  content <- readFileText "input/input7"
-  putTextLn $ "day 7 " <> (show $ run content)
+--  content <- readFileText "input/i8"
+  content <- readFileText "input/input8"
+  putTextLn $ "day 8 " <> (show $ run content)
 
 run :: Text -> (Int , Int)
 run t = minForTuple $ (\i -> aaa i positions) <$> [(L.minimum positions) .. (L.maximum positions)]
