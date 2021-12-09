@@ -32,24 +32,24 @@ xxx :: [[Int]] -> Int
 xxx l = (length $ l Unsafe.!! 0) - 1
 
 bbb :: Matrix -> Point -> [Int] -> [Int] -> Int
-bbb m n l1 l2 = sum $ (\ v -> v + 1) <$> ccc m n l1 l2
+bbb m n l1 l2 = sum $ (\ i -> (getCell m i) + 1) <$> ccc m n l1 l2
 
-ccc :: Matrix -> Point -> [Int] -> [Int] -> [Int]
+ccc :: Matrix -> Point -> [Int] -> [Int] -> [Point]
 ccc m n l1 l2 = catMaybes $ ddd m n l1 l2
 
-ddd :: Matrix -> Point -> [Int] -> [Int] -> [Maybe Int]
+ddd :: Matrix -> Point -> [Int] -> [Int] -> [Maybe Point]
 ddd m n l1 l2 = do
   i1 <- l1
   i2 <- l2
   pure $ checkCell m n (i1 , i2)
 
-checkCell :: Matrix -> Point -> Point -> Maybe Int
+checkCell :: Matrix -> Point -> Point -> Maybe Point
 --checkCell _ (i1, i2) (_, _) = Just (i1, i2)
 checkCell m n i@(i1 , i2) = compareCells m i [maybePoint m n (i1-1 , i2-1) , maybePoint m n (i1-1 , i2) , maybePoint m n (i1-1 , i2+1) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2-1) , maybePoint m n (i1+1 , i2) , maybePoint m n (i1+1 , i2+1)]
 
-compareCells :: Matrix -> Point -> [Maybe Point] -> Maybe Int
+compareCells :: Matrix -> Point -> [Maybe Point] -> Maybe Point
 compareCells m p l
-  | all (compareCell m p) l = Just $ getCell m p
+  | all (compareCell m p) l = Just $ p
   | otherwise = Nothing
 
 compareCell :: Matrix -> Point -> Maybe Point -> Bool
