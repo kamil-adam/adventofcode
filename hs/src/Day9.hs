@@ -10,17 +10,27 @@ import qualified Data.Text     as T
 
 day9 :: IO ()
 day9 = do
---  content <- readFileText "input/i9"
-  content <- readFileText "input/input9"
-  putTextLn $ "day 9 " <> (show $ run content)
+  content <- readFileText "input/i9"
+--  content <- readFileText "input/input9"
+  putTextLn $ "day 9 " <> (show $ run2 content)
 
 type Return = Int
+
+type Return2 = [Int]
+--type Return2 = [[Point]]
 
 run :: Text -> Return
 run t = aaa $ (map readIntFromChar) <$> toString <$> lines t
 
+run2 :: Text -> Return2
+run2 t = aaa2 $ (map readIntFromChar) <$> toString <$> lines t
+
 aaa :: Matrix -> Return
 aaa m = bbb m (yyy m , xxx m) (range0 $ yyy m) (range0 $ xxx m)
+
+aaa2 :: Matrix -> Return2
+aaa2 m = bbb2 m (yyy m , xxx m) (range0 $ yyy m) (range0 $ xxx m)
+
 
 range0 :: Int -> [Int]
 range0 n = [0 .. n]
@@ -31,11 +41,38 @@ yyy l = length l - 1
 xxx :: [[Int]] -> Int
 xxx l = (length $ l Unsafe.!! 0) - 1
 
-bbb :: Matrix -> Point -> [Int] -> [Int] -> Int
-bbb m n l1 l2 = sum $ (\ i -> (getCell m i) + 1) <$> ccc m n l1 l2
+startMatrix :: Point -> [[Bool]]
+startMatrix (n1 , n2) = replicate n1 $ replicate n2 True
 
-ccc :: Matrix -> Point -> [Int] -> [Int] -> [Point]
-ccc m n l1 l2 = catMaybes $ ddd m n l1 l2
+bbb :: Matrix -> Point -> [Int] -> [Int] -> Int
+bbb m n l1 l2 = sum $ (\ i -> (getCell m i) + 1) <$> minimums m n l1 l2
+
+bbb2 :: Matrix -> Point -> [Int] -> [Int] -> Return2
+bbb2 m n l1 l2 = ccc m n $ minimums m n l1 l2
+
+--sumCells :: Point -> Unvisited ->  (Unvisited , Int)
+
+ccc :: Matrix -> Point -> [Point] -> Return2
+ccc m n mi = reverse $ sort $ length <$> rmdups <$> findCells m n <$> mi
+--ccc m n mi = rmdups <$> findCells m n <$> mi
+
+rmdups :: (Ord a) => [a] -> [a]
+rmdups = map Unsafe.head . group . sort
+
+findCells :: Matrix -> Point -> Point -> [Point]
+findCells m n i = findCells2 m n i $ getCell m i
+
+findCells2 :: Matrix -> Point -> Point -> Int -> [Point]
+findCells2 m n i@(i1 , i2) v
+  | 9 == v = []
+--  | otherwise = i : (catMaybes $ [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)])
+  | otherwise = i : (findCells m n =<< (filter (\i' -> checkCell9 v (getCell m i')) $ catMaybes $ [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)]))
+
+checkCell9 :: Int -> Int -> Bool
+checkCell9 v v' = v < v' && v' < 9
+
+minimums :: Matrix -> Point -> [Int] -> [Int] -> [Point]
+minimums m n l1 l2 = catMaybes $ ddd m n l1 l2
 
 ddd :: Matrix -> Point -> [Int] -> [Int] -> [Maybe Point]
 ddd m n l1 l2 = do
@@ -64,6 +101,7 @@ getCell :: Matrix -> Point -> Int
 getCell m (y , x) = (m Unsafe.!! y) Unsafe.!! x
 
 type Matrix = [[Int]]
+type Unvisited  = [[Bool]]
 
 type Point = (Int, Int)
 
