@@ -10,8 +10,8 @@ import qualified Data.Text     as T
 
 day9 :: IO ()
 day9 = do
-  content <- readFileText "input/i9"
---  content <- readFileText "input/input9"
+--  content <- readFileText "input/i9"
+  content <- readFileText "input/input9"
   putTextLn $ "day 9 " <> (show $ run2 content)
 
 type Return = Int
