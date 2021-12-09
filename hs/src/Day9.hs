@@ -44,8 +44,7 @@ ddd m n l1 l2 = do
   pure $ checkCell m n (i1 , i2)
 
 checkCell :: Matrix -> Point -> Point -> Maybe Point
---checkCell _ (i1, i2) (_, _) = Just (i1, i2)
-checkCell m n i@(i1 , i2) = compareCells m i [maybePoint m n (i1-1 , i2-1) , maybePoint m n (i1-1 , i2) , maybePoint m n (i1-1 , i2+1) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2-1) , maybePoint m n (i1+1 , i2) , maybePoint m n (i1+1 , i2+1)]
+checkCell m n i@(i1 , i2) = compareCells m i [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)]
 
 compareCells :: Matrix -> Point -> [Maybe Point] -> Maybe Point
 compareCells m p l
