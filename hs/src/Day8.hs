@@ -1,7 +1,7 @@
 module Day8 where
 
-import qualified Data.Map as Map
-import qualified Data.Set as Set
+import qualified Data.Map  as Map
+import qualified Data.Set  as Set
 
 --import qualified Data.List as L
 import qualified Data.Text as T
@@ -23,12 +23,12 @@ run t = sum $ aaa2 <$> T.splitOn "|" <$> lines t
 --aaa  a         = error $ show a
 
 aaa2 :: [Text] -> Return
-aaa2 [ p , a ]  = mull $ (decode m <$> words a) where m = (findSimple $ words p)
-aaa2  a         = error $ show a
+aaa2 [ p , a ] = mull $ (decode m <$> words a) where m = (findSimple $ words p)
+aaa2  a        = error $ show a
 
 mull :: [Int] -> Int
 mull [a1, a2, a3, a4] = a1 * 1000 + a2 * 100 + a3 * 10 + a4
-mull a = error $ show a
+mull a                = error $ show a
 
 decode :: Map Int Text -> Text -> Int
 decode m t

@@ -1,34 +1,78 @@
 module Day9 where
 
-import qualified Data.Map as Map
-import qualified Data.Set as Set
+import qualified Data.Map      as Map
+import qualified Data.Set      as Set
+
+import qualified Relude.Unsafe as Unsafe
 
 --import qualified Data.List as L
-import qualified Data.Text as T
+import qualified Data.Text     as T
 
 day9 :: IO ()
 day9 = do
---  content <- readFileText "input/i8"
---  content <- readFileText "input/in8"
-  content <- readFileText "input/input8"
+--  content <- readFileText "input/i9"
+  content <- readFileText "input/input9"
   putTextLn $ "day 9 " <> (show $ run content)
 
 type Return = Int
 
 run :: Text -> Return
-run t = sum $ aaa2 <$> T.splitOn "|" <$> lines t
+run t = aaa $ (map readIntFromChar) <$> toString <$> lines t
 
---aaa :: [Text] -> Return
---aaa [ p , a ]  = mull $ checkText m <$> words a where m = findSimple p
---aaa  a         = error $ show a
+aaa :: Matrix -> Return
+aaa m = bbb m (yyy m , xxx m) (range0 $ yyy m) (range0 $ xxx m)
 
-aaa2 :: [Text] -> Return
-aaa2 [ p , a ]  = mull $ (decode m <$> words a) where m = (findSimple $ words p)
-aaa2  a         = error $ show a
+range0 :: Int -> [Int]
+range0 n = [0 .. n]
+
+yyy :: [[Int]] -> Int
+yyy l = length l - 1
+
+xxx :: [[Int]] -> Int
+xxx l = (length $ l Unsafe.!! 0) - 1
+
+bbb :: Matrix -> Point -> [Int] -> [Int] -> Int
+bbb m n l1 l2 = sum $ (\ v -> v + 1) <$> ccc m n l1 l2
+
+ccc :: Matrix -> Point -> [Int] -> [Int] -> [Int]
+ccc m n l1 l2 = catMaybes $ ddd m n l1 l2
+
+ddd :: Matrix -> Point -> [Int] -> [Int] -> [Maybe Int]
+ddd m n l1 l2 = do
+  i1 <- l1
+  i2 <- l2
+  pure $ checkCell m n (i1 , i2)
+
+checkCell :: Matrix -> Point -> Point -> Maybe Int
+--checkCell _ (i1, i2) (_, _) = Just (i1, i2)
+checkCell m n i@(i1 , i2) = compareCells m i [maybePoint m n (i1-1 , i2-1) , maybePoint m n (i1-1 , i2) , maybePoint m n (i1-1 , i2+1) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2-1) , maybePoint m n (i1+1 , i2) , maybePoint m n (i1+1 , i2+1)]
+
+compareCells :: Matrix -> Point -> [Maybe Point] -> Maybe Int
+compareCells m p l
+  | all (compareCell m p) l = Just $ getCell m p
+  | otherwise = Nothing
+
+compareCell :: Matrix -> Point -> Maybe Point -> Bool
+compareCell m p (Just p') = getCell m p < getCell m p'
+compareCell _ _  Nothing  = True
+
+maybePoint :: Matrix -> Point -> Point -> Maybe Point
+maybePoint _ (n1, n2) i@(i1, i2)
+  | 0 <= i1 && 0 <= i2 && i1 <= n1 && i2 <= n2 = Just i
+  | otherwise = Nothing
+
+getCell :: Matrix -> Point -> Int
+getCell m (y , x) = (m Unsafe.!! y) Unsafe.!! x
+
+type Matrix = [[Int]]
+
+type Point = (Int, Int)
+
+----
 
 mull :: [Int] -> Int
 mull [a1, a2, a3, a4] = a1 * 1000 + a2 * 100 + a3 * 10 + a4
-mull a = error $ show a
+mull a                = error $ show a
 
 decode :: Map Int Text -> Text -> Int
 decode m t
@@ -91,6 +135,9 @@ transpose2 :: [[a]] -> [[a]]
 transpose2 = getZipList . traverse ZipList
 
 ------
+
+readIntFromChar :: Char -> Int
+readIntFromChar c = readInt $ toText $ [c]
 
 readInt :: Text -> Int
 readInt = readUnsafe

@@ -8,7 +8,7 @@ module Day7 where
 
 --import           Data.List.Split
 
-import qualified Data.Map as Map
+import qualified Data.Map  as Map
 
 import qualified Data.List as L
 import qualified Data.Text as T
@@ -40,7 +40,7 @@ normalize2 i l = (\ i' -> cal $ abs $ i' - i) <$> l
 
 cal :: Int -> Int
 cal i = go 0 i where
-  go s 0 = s
+  go s 0  = s
   go s i' = go (s + i') (i' - 1)
 
 -- 1 -> 1

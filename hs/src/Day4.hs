@@ -31,19 +31,19 @@ eee :: Board -> Int
 eee board = sum $ ggg <$> filter isRight (id =<< board)
 
 fff :: Cell -> Int
-fff (Left i) = i
+fff (Left i)  = i
 fff (Right i) = error $ show i
 
 ggg :: Cell -> Int
 ggg (Right i) = i
-ggg (Left i) = error $ show i
+ggg (Left i)  = error $ show i
 
 --ccc :: [Int] -> [Board] -> (Maybe Int , [Board])
 --ccc [] boards = (Nothing , boards)
 --ccc (x : xs) boards =  ddd x xs (markCellInBoards x boards)
 
 ccc2 :: [Int] -> [Board] -> [(Maybe Int , [Board])]
-ccc2 [] boards = [(Nothing , boards)]
+ccc2 [] boards       = [(Nothing , boards)]
 ccc2 (x : xs) boards = ddd2 x xs (markCellInBoards x boards)
 
 --ddd :: Int -> [Int] -> [Board] -> (Maybe Int , [Board])

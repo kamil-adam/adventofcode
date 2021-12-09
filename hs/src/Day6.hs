@@ -8,7 +8,7 @@ module Day6 where
 
 --import           Data.List.Split
 
-import qualified Data.Map as Map
+import qualified Data.Map  as Map
 
 import qualified Data.Text as T
 
@@ -32,7 +32,7 @@ run3 t = aaa3 $ lines t
 
 aaa3 :: [Text] -> Result3
 aaa3 [t] = bbb3 t
-aaa3 t = error $ show t
+aaa3 t   = error $ show t
 
 bbb3 :: Text -> Result3
 bbb3 t = nextDay3 0 256 $ frequency (readInt <$> T.splitOn "," t)
@@ -79,7 +79,7 @@ run1 t = aaa $ lines t
 
 aaa :: [Text] ->  [Int]
 aaa [t] = bbb t
-aaa t = error $ show t
+aaa t   = error $ show t
 
 bbb :: Text ->  [Int]
 bbb t = nextDay 0 80 (readInt <$> T.splitOn "," t)

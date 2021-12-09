@@ -8,7 +8,7 @@ module Day5 where
 
 --import           Data.List.Split
 
-import qualified Data.Map as Map
+import qualified Data.Map  as Map
 
 import qualified Data.Text as T
 
@@ -63,11 +63,11 @@ intList l = readInt <$> l
 bbb :: [[Int]] -> Line
 bbb [[x1 , y1], [x2 , y2]] = ((x1 , y1) , (x2 , y2))
 --bbb [[x1 , y1 , x2 , y2]] = ((x1 , y1) , (x2 , y2))
-bbb t = error $ "[[x1 , y1], [x2 , y2]] " <> show t
+bbb t                      = error $ "[[x1 , y1], [x2 , y2]] " <> show t
 
 ccc :: [Int] -> Line
 ccc [x1 , y1 , x2 , y2] = ((x1 , y1) , (x2 , y2))
-ccc t = error $ "[x1 , y1, x2 , y2] " <> show t
+ccc t                   = error $ "[x1 , y1, x2 , y2] " <> show t
 
 type Line = (Point , Point)
 type Point = (Int , Int)
