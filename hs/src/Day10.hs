@@ -10,17 +10,18 @@ import qualified Data.Text     as T
 
 day10 :: IO ()
 day10 = do
-  content <- readFileText "input/i10"
---  content <- readFileText "input/input10"
+--  content <- readFileText "input/i10"
+  content <- readFileText "input/input10"
   putTextLn $ "day 10 " <> (show $ run1 content)
 
+--type Return = [Maybe Int]
 type Return = Int
 
 type Return2 = [Int]
 --type Return2 = [[Point]]
 
-run1 :: Text -> [Maybe Int]
-run1 t = start [] <$> toString <$> lines t
+run1 :: Text -> Return
+run1 t = sum $ catMaybes $ start [] <$> toString <$> lines t
 
 --aaa :: String -> Maybe Int
 --aaa []       = Nothing
