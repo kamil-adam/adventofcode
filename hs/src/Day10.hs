@@ -23,18 +23,6 @@ type Return2 = [Int]
 run1 :: Text -> Return
 run1 t = sum $ catMaybes $ start [] <$> toString <$> lines t
 
---aaa :: String -> Maybe Int
---aaa []       = Nothing
---aaa [a]      = ccc a
---aaa (e : s)  = bbb $ (e, Unsafe.last s, Unsafe.init s)
---
---bbb :: (Char, Char, String) -> Maybe Int
---bbb ('(' , ')' , s) = aaa s
---bbb ('[' , ']' , s) = aaa s
---bbb ('{' , '}' , s) = aaa s
---bbb ('<' , '>' , s) = aaa s
---bbb ( _  ,  a  , _) = ccc a
-
 start :: String -> String -> Maybe Int
 start _ []        = Nothing
 --start st [c]      = compute st c []
@@ -54,14 +42,11 @@ expect st c' (c : s)
   | c' == c   = start st s
   | otherwise = startWithChar (c' : st) c s
 
-
-
 compute :: String -> Char -> String -> Maybe Int
 compute (c' : st) c s
   | c' == c   = start st s
   | otherwise = Just $ check c
 compute st c  s  = error $ show c <> " " <> show s <> " " <> show st
-------
 
 check :: Char -> Int
 check ')' = 3
@@ -69,6 +54,8 @@ check ']' = 57
 check '}' = 1197
 check '>' = 25137
 check  c  = error $ show c
+
+------
 
 rmdups :: (Ord a) => [a] -> [a]
 rmdups = map Unsafe.head . group . sort
