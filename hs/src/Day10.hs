@@ -47,7 +47,8 @@ startWithChar st '<' s = expect st '>' s
 startWithChar st  c  s = compute st c s
 
 expect :: String -> Char -> String -> Maybe Int
-expect st c' []  = compute st c' []
+--expect st c' []  = compute st c' []
+expect _ _ [] = Nothing
 expect st c' (c : s)
   | c' == c   = start st s
   | otherwise = startWithChar (c' : st) c s
