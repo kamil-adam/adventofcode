@@ -12,49 +12,61 @@ day10 :: IO ()
 day10 = do
   content <- readFileText "input/i10"
 --  content <- readFileText "input/input10"
-  putTextLn $ "day 10 " <> (show $ run2 content)
+  putTextLn $ "day 10 " <> (show $ run1 content)
 
 type Return = Int
 
 type Return2 = [Int]
 --type Return2 = [[Point]]
 
-run :: Text -> Return
-run t = aaa $ (map readIntFromChar) <$> toString <$> lines t
+run1 :: Text -> [Maybe Int]
+run1 t = start [] <$> toString <$> lines t
 
-run2 :: Text -> Return2
-run2 t = aaa2 $ (map readIntFromChar) <$> toString <$> lines t
+--aaa :: String -> Maybe Int
+--aaa []       = Nothing
+--aaa [a]      = ccc a
+--aaa (e : s)  = bbb $ (e, Unsafe.last s, Unsafe.init s)
+--
+--bbb :: (Char, Char, String) -> Maybe Int
+--bbb ('(' , ')' , s) = aaa s
+--bbb ('[' , ']' , s) = aaa s
+--bbb ('{' , '}' , s) = aaa s
+--bbb ('<' , '>' , s) = aaa s
+--bbb ( _  ,  a  , _) = ccc a
 
-aaa :: Matrix -> Return
-aaa m = bbb m (yyy m , xxx m) (range0 $ yyy m) (range0 $ xxx m)
+start :: String -> String -> Maybe Int
+start _ []        = Nothing
+--start st [c]      = compute st c []
+start st (c : s)  = startWithChar st c s
 
-aaa2 :: Matrix -> Return2
-aaa2 m = bbb2 m (yyy m , xxx m) (range0 $ yyy m) (range0 $ xxx m)
+startWithChar :: String -> Char -> String -> Maybe Int
+startWithChar st '(' s = expect st ')' s
+startWithChar st '[' s = expect st ']' s
+startWithChar st '{' s = expect st '}' s
+startWithChar st '<' s = expect st '>' s
+startWithChar st  c  s = compute st c s
+
+expect :: String -> Char -> String -> Maybe Int
+expect st c' []  = compute st c' []
+expect st c' (c : s)
+  | c' == c   = start st s
+  | otherwise = startWithChar (c' : st) c s
 
 
-range0 :: Int -> [Int]
-range0 n = [0 .. n]
 
-yyy :: [[Int]] -> Int
-yyy l = length l - 1
+compute :: String -> Char -> String -> Maybe Int
+compute (c' : st) c s
+  | c' == c   = start st s
+  | otherwise = Just $ check c
+compute st c  s  = error $ show c <> " " <> show s <> " " <> show st
+------
 
-xxx :: [[Int]] -> Int
-xxx l = (length $ l Unsafe.!! 0) - 1
-
-startMatrix :: Point -> [[Bool]]
-startMatrix (n1 , n2) = replicate n1 $ replicate n2 True
-
-bbb :: Matrix -> Point -> [Int] -> [Int] -> Int
-bbb m n l1 l2 = sum $ (\ i -> (getCell m i) + 1) <$> minimums m n l1 l2
-
-bbb2 :: Matrix -> Point -> [Int] -> [Int] -> Return2
-bbb2 m n l1 l2 = ccc m n $ minimums m n l1 l2
-
---sumCells :: Point -> Unvisited ->  (Unvisited , Int)
-
-ccc :: Matrix -> Point -> [Point] -> Return2
-ccc m n mi = reverse $ sort $ length <$> rmdups <$> findCells m n <$> mi
---ccc m n mi = rmdups <$> findCells m n <$> mi
+check :: Char -> Int
+check ')' = 3
+check ']' = 57
+check '}' = 1197
+check '>' = 25137
+check  c  = error $ show c
 
 rmdups :: (Ord a) => [a] -> [a]
 rmdups = map Unsafe.head . group . sort
@@ -146,11 +158,11 @@ getMaybe (Just a) = a
 getMaybe Nothing  = error "e"
 
 
---ccc
---ccc 2 = 1
---ccc 3 = 7
---ccc 4 = 4
---ccc 7 = 8
+--bbb
+--bbb 2 = 1
+--bbb 3 = 7
+--bbb 4 = 4
+--bbb 7 = 8
 
 --ddd
 
