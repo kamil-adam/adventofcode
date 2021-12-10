@@ -52,6 +52,7 @@ check2 '}' = 1197
 check2 '>' = 25137
 check2  c  = error $ show c
 
+------
 
 --type Return = [Maybe Int]
 type Return = Int
