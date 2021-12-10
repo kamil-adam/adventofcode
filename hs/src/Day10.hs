@@ -12,13 +12,50 @@ day10 :: IO ()
 day10 = do
 --  content <- readFileText "input/i10"
   content <- readFileText "input/input10"
-  putTextLn $ "day 10 " <> (show $ run1 content)
+  putTextLn $ "day 10 " <> (show $ run2 content)
+
+--type Return2 = [[Point]]
+type Return2 = Int
+
+run2 :: Text -> Return2
+run2 t = sum $ catMaybes $ start2 [] <$> toString <$> lines t
+
+start2 :: String -> String -> Maybe Int
+start2 _ []        = Nothing
+--start st [c]      = compute st c []
+start2 st (c : s)  = startWithChar2 st c s
+
+startWithChar2 :: String -> Char -> String -> Maybe Int
+startWithChar2 st '(' s = expect2 st ')' s
+startWithChar2 st '[' s = expect2 st ']' s
+startWithChar2 st '{' s = expect2 st '}' s
+startWithChar2 st '<' s = expect2 st '>' s
+startWithChar2 st  c  s = compute2 st c s
+
+expect2 :: String -> Char -> String -> Maybe Int
+--expect st c' []  = compute st c' []
+expect2 _ _ [] = Nothing
+expect2 st c' (c : s)
+  | c' == c   = start2 st s
+  | otherwise = startWithChar2 (c' : st) c s
+
+compute2 :: String -> Char -> String -> Maybe Int
+compute2 (c' : st) c s
+  | c' == c   = start2 st s
+  | otherwise = Just $ check2 c
+compute2 st c  s  = error $ show c <> " " <> show s <> " " <> show st
+
+check2 :: Char -> Int
+check2 ')' = 3
+check2 ']' = 57
+check2 '}' = 1197
+check2 '>' = 25137
+check2  c  = error $ show c
+
 
 --type Return = [Maybe Int]
 type Return = Int
 
-type Return2 = [Int]
---type Return2 = [[Point]]
 
 run1 :: Text -> Return
 run1 t = sum $ catMaybes $ start [] <$> toString <$> lines t
