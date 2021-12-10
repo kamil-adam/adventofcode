@@ -42,7 +42,8 @@ expect2 st c' (c : s)
 compute2 :: String -> Char -> String -> Maybe Int
 compute2 (c' : st) c s
   | c' == c   = start2 st s
-  | otherwise = Just $ check2 c
+--  | otherwise = Just $ check2 c
+  | otherwise = Nothing
 compute2 st c  s  = error $ show c <> " " <> show s <> " " <> show st
 
 check2 :: Char -> Int
@@ -51,6 +52,8 @@ check2 ']' = 57
 check2 '}' = 1197
 check2 '>' = 25137
 check2  c  = error $ show c
+
+
 
 ------
 
