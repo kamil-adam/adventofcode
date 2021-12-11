@@ -1,4 +1,4 @@
-module Day10 where
+module Day11 where
 
 import qualified Data.Map      as Map
 import qualified Data.Set      as Set
@@ -8,8 +8,8 @@ import qualified Relude.Unsafe as Unsafe
 --import qualified Data.List as L
 import qualified Data.Text     as T
 
-day10 :: IO ()
-day10 = do
+day11 :: IO ()
+day11 = do
 --  content <- readFileText "input/i10"
 --  content <- readFileText "input/in10"
   content <- readFileText "input/input10"
