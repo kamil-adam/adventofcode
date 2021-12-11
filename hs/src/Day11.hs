@@ -10,51 +10,93 @@ import qualified Data.Text     as T
 
 day11 :: IO ()
 day11 = do
---  content <- readFileText "input/i10"
---  content <- readFileText "input/in10"
-  content <- readFileText "input/input10"
-  putTextLn $ "day 10 " <> (show $ run2 content)
+--  content <- readFileText "input/i11"
+  content <- readFileText "input/in11"
+--  content <- readFileText "input/input11"
+  putTextLn $ "day 10 " <> (show $ run1 content)
 
---type Return2 = [Maybe Int]
---type Return2 = [Int]
-type Return2 = Int
+type Return = (Int, Board)
 
-run2 :: Text -> Return2
-run2 t = middle $ sort $ catMaybes $ start2 [] <$> toString <$> lines t
---run2 t = sort $ catMaybes $ start2 [] <$> toString <$> lines t
---run2 t = start2 [] <$> toString <$> lines t
+run1 :: Text -> Return
+run1 t =  step 1 (0 , (map readIntFromChar <$> toString <$> lines t))
 
-start2 :: String -> String -> Maybe Int
---start2 _ []        = Nothing
-start2 st   []     = Just $ checkState 0 st
---start st [c]      = compute st c []
-start2 st (c : s)  = startWithChar2 st c s
+step :: Int -> BoardState -> BoardState
+step 0 s = s
+step i (r , b) = step (i - 1) $ checkBoard (r , b')
+  where b' = add1ForBoard b
 
-startWithChar2 :: String -> Char -> String -> Maybe Int
-startWithChar2 st '(' s = expect2 st ')' s
-startWithChar2 st '[' s = expect2 st ']' s
-startWithChar2 st '{' s = expect2 st '}' s
-startWithChar2 st '<' s = expect2 st '>' s
-startWithChar2 st  c  s = compute2 st c s
+checkBoard  :: BoardState -> BoardState
+checkBoard (r , b) = flash l (r , b)
+  where
+    l = catMaybes $ join( (\i1 -> ((\i2 -> checkPoint b (i1 , i2)) <$> [0 .. l2])) <$> [0 .. l1])
+    l1 = (length b) - 1
+    l2 = (length $ Unsafe.head b) - 1
 
-expect2 :: String -> Char -> String -> Maybe Int
---expect st c' []  = compute st c' []
-expect2 st c' [] = Just $ checkState 0 (c' : st)
-expect2 st c' (c : s)
-  | c' == c   = start2 st s
-  | otherwise = startWithChar2 (c' : st) c s
+flash :: [Point] -> BoardState -> BoardState
+flash [] s = s
+flash l (r , b) = checkBoard (r' , (incPoints l b'))
+  where
+    r' = r + length l
+    b' = zeroPoints l b
 
-compute2 :: String -> Char -> String -> Maybe Int
-compute2 (c' : st) c s
-  | c' == c   = start2 st s
---  | otherwise = Just $ check2 c
+incPoints :: [Point] -> Board -> Board
+incPoints      [] b = b
+incPoints (p : l) b = incPoints l $ incNHPoint p b
+
+incNHPoint :: Point -> Board -> Board
+incNHPoint p b = incNH (catMaybes (checkPointExists b <$> (nh p))) b
+
+incNH :: [Point] -> Board -> Board
+incNH [] b = b
+incNH (p : l) b = incNH l $ incPointInNH p b
+
+incPointInNH :: Point -> Board -> Board
+incPointInNH (i1 , i2) b
+  | value == 0 = b
+  | otherwise  = (replaceInList i1 (replaceInList i2 (value + 1) (b Unsafe.!! i1)) b)
+    where value = (b Unsafe.!! i1) Unsafe.!! i2
+
+nh :: Point -> [Point]
+nh (i1 , i2) =
+       [(i1 - 1 , i2 - 1) , (i1 - 1 , i2) , (i1  - 1, i2 + 1)
+       , (i1     , i2 - 1) ,                 (i1     , i2 + 1)
+       , (i1 + 1 , i2 - 1) , (i1 + 1 , i2) , (i1  + 1, i2 + 1)
+       ]
+
+checkPointExists :: Board -> Point -> Maybe Point
+checkPointExists b p@(i1 , i2)
+  | 0 <= i1 && i1 < (length b) && 0 <= i2 && i2 < (length (Unsafe.head b)) = Just p
   | otherwise = Nothing
-compute2 st c  s  = error $ show c <> " " <> show s <> " " <> show st
 
-checkState :: Int -> String -> Int
-checkState st      [] = st
-checkState st (c : s) = checkState ((st * 5) + (check2 c)) s
---checkState _      s = error $ show s
+zeroPoints :: [Point] -> Board -> Board
+zeroPoints [] b = b
+zeroPoints ((i1, i2) : l) b = zeroPoints l $ replaceInList i1 (replaceInList i2 0 (b Unsafe.!! i1)) b
+
+replaceInList :: Int -> a -> [a] -> [a]
+replaceInList i e l = h <> (e : (Unsafe.tail t)) where (h , t) = splitAt i l
+--replaceInList i _ _ = error $ show i
+
+checkPoint :: Board -> Point -> Maybe Point
+checkPoint b p@(i1, i2)
+  | (b Unsafe.!! i1) Unsafe.!! i2 >= 9 = Just p
+  | otherwise                          = Nothing
+
+add1ForBoard :: Board -> Board
+add1ForBoard b = add1ForLine <$> b
+
+add1ForLine :: Line -> Line
+add1ForLine l = add1ForCell <$> l
+
+add1ForCell :: Cell -> Cell
+add1ForCell c = c + 1
+
+type BoardState = (Int , Board)
+
+type Board = [Line]
+type Line  = [Cell]
+type Cell = Int
+
+--------
 
 check2 :: Char -> Int
 check2 ')' = 1
@@ -72,43 +114,7 @@ middle l = l Unsafe.!! (((length l) `div` 2))
 ------
 
 --type Return = [Maybe Int]
-type Return = Int
-
-
-run1 :: Text -> Return
-run1 t = sum $ catMaybes $ start [] <$> toString <$> lines t
-
-start :: String -> String -> Maybe Int
-start _ []        = Nothing
---start st [c]      = compute st c []
-start st (c : s)  = startWithChar st c s
-
-startWithChar :: String -> Char -> String -> Maybe Int
-startWithChar st '(' s = expect st ')' s
-startWithChar st '[' s = expect st ']' s
-startWithChar st '{' s = expect st '}' s
-startWithChar st '<' s = expect st '>' s
-startWithChar st  c  s = compute st c s
-
-expect :: String -> Char -> String -> Maybe Int
---expect st c' []  = compute st c' []
-expect _ _ [] = Nothing
-expect st c' (c : s)
-  | c' == c   = start st s
-  | otherwise = startWithChar (c' : st) c s
-
-compute :: String -> Char -> String -> Maybe Int
-compute (c' : st) c s
-  | c' == c   = start st s
-  | otherwise = Just $ check c
-compute st c  s  = error $ show c <> " " <> show s <> " " <> show st
-
-check :: Char -> Int
-check ')' = 3
-check ']' = 57
-check '}' = 1197
-check '>' = 25137
-check  c  = error $ show c
+--type Return = Int
 
 ------
 
