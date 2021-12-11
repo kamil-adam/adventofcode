@@ -11,14 +11,27 @@ import qualified Data.Text     as T
 day11 :: IO ()
 day11 = do
 --  content <- readFileText "input/i11"
-  content <- readFileText "input/in11"
---  content <- readFileText "input/input11"
-  putTextLn $ "day 10 " <> (show $ run1 content)
+--  content <- readFileText "input/in11"
+  content <- readFileText "input/input11"
+  putTextLn $ "day 10 " <> (show $ run2 content)
 
 type Return = (Int, Board)
 
+run2 :: Text -> Int
+run2 t = step2 0 (0 , (map readIntFromChar <$> toString <$> lines t))
+
+step2 :: Int -> BoardState -> Int
+step2 i (r , b)
+  | checkAllCell b = i
+  | otherwise      = step2 (i + 1) $ checkBoard (r , b')
+      where b' = add1ForBoard b
+
+checkAllCell :: Board -> Bool
+--checkAllCell b = b == (replicate 10 $ replicate 10 (0::Int))
+checkAllCell b = 0 == (sum $ sum <$> b)
+
 run1 :: Text -> Return
-run1 t =  step 1 (0 , (map readIntFromChar <$> toString <$> lines t))
+run1 t =  step 100 (0 , (map readIntFromChar <$> toString <$> lines t))
 
 step :: Int -> BoardState -> BoardState
 step 0 s = s
@@ -78,7 +91,7 @@ replaceInList i e l = h <> (e : (Unsafe.tail t)) where (h , t) = splitAt i l
 
 checkPoint :: Board -> Point -> Maybe Point
 checkPoint b p@(i1, i2)
-  | (b Unsafe.!! i1) Unsafe.!! i2 >= 9 = Just p
+  | (b Unsafe.!! i1) Unsafe.!! i2 > 9 = Just p
   | otherwise                          = Nothing
 
 add1ForBoard :: Board -> Board
