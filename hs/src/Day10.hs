@@ -11,17 +11,22 @@ import qualified Data.Text     as T
 day10 :: IO ()
 day10 = do
 --  content <- readFileText "input/i10"
+--  content <- readFileText "input/in10"
   content <- readFileText "input/input10"
   putTextLn $ "day 10 " <> (show $ run2 content)
 
---type Return2 = [[Point]]
+--type Return2 = [Maybe Int]
+--type Return2 = [Int]
 type Return2 = Int
 
 run2 :: Text -> Return2
-run2 t = sum $ catMaybes $ start2 [] <$> toString <$> lines t
+run2 t = middle $ sort $ catMaybes $ start2 [] <$> toString <$> lines t
+--run2 t = sort $ catMaybes $ start2 [] <$> toString <$> lines t
+--run2 t = start2 [] <$> toString <$> lines t
 
 start2 :: String -> String -> Maybe Int
-start2 _ []        = Nothing
+--start2 _ []        = Nothing
+start2 st   []     = Just $ checkState 0 st
 --start st [c]      = compute st c []
 start2 st (c : s)  = startWithChar2 st c s
 
@@ -34,7 +39,7 @@ startWithChar2 st  c  s = compute2 st c s
 
 expect2 :: String -> Char -> String -> Maybe Int
 --expect st c' []  = compute st c' []
-expect2 _ _ [] = Nothing
+expect2 st c' [] = Just $ checkState 0 (c' : st)
 expect2 st c' (c : s)
   | c' == c   = start2 st s
   | otherwise = startWithChar2 (c' : st) c s
@@ -46,14 +51,23 @@ compute2 (c' : st) c s
   | otherwise = Nothing
 compute2 st c  s  = error $ show c <> " " <> show s <> " " <> show st
 
+checkState :: Int -> String -> Int
+checkState st      [] = st
+checkState st (c : s) = checkState ((st * 5) + (check2 c)) s
+--checkState _      s = error $ show s
+
 check2 :: Char -> Int
-check2 ')' = 3
-check2 ']' = 57
-check2 '}' = 1197
-check2 '>' = 25137
+check2 ')' = 1
+check2 ']' = 2
+check2 '}' = 3
+check2 '>' = 4
 check2  c  = error $ show c
 
+middle :: [a] -> a
+middle l = l Unsafe.!! (((length l) `div` 2))
 
+-- 2441
+-- )}>]}) = ((((((1 * 5 + 3) * 5 + 4) * 5) + 2) * 5) +  3) * 5 + 1
 
 ------
 
