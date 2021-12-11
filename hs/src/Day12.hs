@@ -8,11 +8,11 @@ import qualified Relude.Unsafe as Unsafe
 --import qualified Data.List as L
 import qualified Data.Text     as T
 
-day11 :: IO ()
-day11 = do
---  content <- readFileText "input/i11"
---  content <- readFileText "input/in11"
-  content <- readFileText "input/input11"
+day12 :: IO ()
+day12 = do
+  content <- readFileText "input/i12"
+--  content <- readFileText "input/in12"
+--  content <- readFileText "input/input12"
   putTextLn $ "day 10 " <> (show $ run2 content)
 
 type Return = (Int, Board)
