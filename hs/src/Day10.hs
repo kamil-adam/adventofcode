@@ -26,9 +26,9 @@ run2 t = middle $ sort $ catMaybes $ start2 [] <$> toString <$> lines t
 
 start2 :: String -> String -> Maybe Int
 --start2 _ []        = Nothing
-start2 st   []     = Just $ checkState 0 st
+start2 st   []    = Just $ checkState 0 st
 --start st [c]      = compute st c []
-start2 st (c : s)  = startWithChar2 st c s
+start2 st (c : s) = startWithChar2 st c s
 
 startWithChar2 :: String -> Char -> String -> Maybe Int
 startWithChar2 st '(' s = expect2 st ')' s
@@ -79,9 +79,9 @@ run1 :: Text -> Return
 run1 t = sum $ catMaybes $ start [] <$> toString <$> lines t
 
 start :: String -> String -> Maybe Int
-start _ []        = Nothing
+start _ []       = Nothing
 --start st [c]      = compute st c []
-start st (c : s)  = startWithChar st c s
+start st (c : s) = startWithChar st c s
 
 startWithChar :: String -> Char -> String -> Maybe Int
 startWithChar st '(' s = expect st ')' s

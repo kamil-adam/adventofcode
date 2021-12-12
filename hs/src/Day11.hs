@@ -60,7 +60,7 @@ incNHPoint :: Point -> Board -> Board
 incNHPoint p b = incNH (catMaybes (checkPointExists b <$> (nh p))) b
 
 incNH :: [Point] -> Board -> Board
-incNH [] b = b
+incNH [] b      = b
 incNH (p : l) b = incNH l $ incPointInNH p b
 
 incPointInNH :: Point -> Board -> Board
@@ -82,7 +82,7 @@ checkPointExists b p@(i1 , i2)
   | otherwise = Nothing
 
 zeroPoints :: [Point] -> Board -> Board
-zeroPoints [] b = b
+zeroPoints [] b             = b
 zeroPoints ((i1, i2) : l) b = zeroPoints l $ replaceInList i1 (replaceInList i2 0 (b Unsafe.!! i1)) b
 
 replaceInList :: Int -> a -> [a] -> [a]
