@@ -35,6 +35,7 @@ common common-options
   build-depends:
       base                 <  4.16
     , relude               == 1.0.0.1
+    , extra
   mixins:
       base hiding (Prelude)
     , relude (Relude as Prelude, Relude.Extra, Data.Text, Relude.Unsafe)

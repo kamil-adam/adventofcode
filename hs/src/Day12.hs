@@ -8,102 +8,57 @@ import qualified Relude.Unsafe as Unsafe
 --import qualified Data.List as L
 import qualified Data.Text     as T
 
+import qualified Data.List.Extra as L
+
 day12 :: IO ()
 day12 = do
-  content <- readFileText "input/i12"
+  t <- readFileText "input/i12"
 --  content <- readFileText "input/in12"
 --  content <- readFileText "input/input12"
-  putTextLn $ "day 10 " <> (show $ run2 content)
+  putTextLn $ "day 10 " <> (show (run1 t))
 
-type Return = (Int, Board)
+type Paths = [Path]
+type Path = [Text]
 
-run2 :: Text -> Int
-run2 t = step2 0 (0 , (map readIntFromChar <$> toString <$> lines t))
+type CaveMap = Map Text [Text]
+--type ReturnA = [(Text , [Text])]
+--type Return = Int
 
-step2 :: Int -> BoardState -> Int
-step2 i (r , b)
-  | checkAllCell b = i
-  | otherwise      = step2 (i + 1) $ checkBoard (r , b')
-      where b' = add1ForBoard b
+run1 :: Text -> CaveMap
+run1 t = Map.fromList $ bbb t
 
-checkAllCell :: Board -> Bool
---checkAllCell b = b == (replicate 10 $ replicate 10 (0::Int))
-checkAllCell b = 0 == (sum $ sum <$> b)
+buildFromStart :: CaveMap -> Paths
+buildFromStart caveMap = build caveMap [] "start"
 
-run1 :: Text -> Return
-run1 t =  step 100 (0 , (map readIntFromChar <$> toString <$> lines t))
+--build :: Text -> Paths -> Paths -> CaveMap -> Paths
+build :: CaveMap ->  Path -> Text -> Paths
+build caveMap current name
+  | name == T.toLower name && (elem name current) = []
+  | name == "end" = [current <> ["end"]]
+  | otherwise     = paths
+    where
+      paths = join $ ((build caveMap current') <$> names)
+      names     = caveMap Map.! name
+      current' = current <> [name]
 
-step :: Int -> BoardState -> BoardState
-step 0 s = s
-step i (r , b) = step (i - 1) $ checkBoard (r , b')
-  where b' = add1ForBoard b
 
-checkBoard  :: BoardState -> BoardState
-checkBoard (r , b) = flash l (r , b)
-  where
-    l = catMaybes $ join( (\i1 -> ((\i2 -> checkPoint b (i1 , i2)) <$> [0 .. l2])) <$> [0 .. l1])
-    l1 = (length b) - 1
-    l2 = (length $ Unsafe.head b) - 1
 
-flash :: [Point] -> BoardState -> BoardState
-flash [] s = s
-flash l (r , b) = checkBoard (r' , (incPoints l b'))
-  where
-    r' = r + length l
-    b' = zeroPoints l b
 
-incPoints :: [Point] -> Board -> Board
-incPoints      [] b = b
-incPoints (p : l) b = incPoints l $ incNHPoint p b
 
-incNHPoint :: Point -> Board -> Board
-incNHPoint p b = incNH (catMaybes (checkPointExists b <$> (nh p))) b
+bbb :: Text -> [(Text , [Text])]
+bbb t = ccc <$> (L.groupOn (\ (k , _) -> k) $ sort $ aaa =<< (T.splitOn "-" <$> lines t))
+--bbb t = ccc <$> (L.groupBy (\ (k1 , _) (k2 , _) -> k1 == k2) $ aaa =<< (T.splitOn "-" <$> lines t))
 
-incNH :: [Point] -> Board -> Board
-incNH [] b      = b
-incNH (p : l) b = incNH l $ incPointInNH p b
+ccc :: [(Text , Text)] -> (Text, [Text])
+ccc l@((k, _) : _) = (k , (\(_ , v) -> v) <$> l)
+ccc []             = error "ccc"
 
-incPointInNH :: Point -> Board -> Board
-incPointInNH (i1 , i2) b
-  | value == 0 = b
-  | otherwise  = (replaceInList i1 (replaceInList i2 (value + 1) (b Unsafe.!! i1)) b)
-    where value = (b Unsafe.!! i1) Unsafe.!! i2
+aaa :: [Text] -> [(Text , Text)]
+aaa [a1 , a2] = [(a1 , a2) , (a2 , a1)]
+aaa  a        = error $ show a
 
-nh :: Point -> [Point]
-nh (i1 , i2) =
-       [(i1 - 1 , i2 - 1) , (i1 - 1 , i2) , (i1  - 1, i2 + 1)
-       , (i1     , i2 - 1) ,                 (i1     , i2 + 1)
-       , (i1 + 1 , i2 - 1) , (i1 + 1 , i2) , (i1  + 1, i2 + 1)
-       ]
 
-checkPointExists :: Board -> Point -> Maybe Point
-checkPointExists b p@(i1 , i2)
-  | 0 <= i1 && i1 < (length b) && 0 <= i2 && i2 < (length (Unsafe.head b)) = Just p
-  | otherwise = Nothing
-
-zeroPoints :: [Point] -> Board -> Board
-zeroPoints [] b             = b
-zeroPoints ((i1, i2) : l) b = zeroPoints l $ replaceInList i1 (replaceInList i2 0 (b Unsafe.!! i1)) b
-
-replaceInList :: Int -> a -> [a] -> [a]
-replaceInList i e l = h <> (e : (Unsafe.tail t)) where (h , t) = splitAt i l
---replaceInList i _ _ = error $ show i
-
-checkPoint :: Board -> Point -> Maybe Point
-checkPoint b p@(i1, i2)
-  | (b Unsafe.!! i1) Unsafe.!! i2 > 9 = Just p
-  | otherwise                          = Nothing
-
-add1ForBoard :: Board -> Board
-add1ForBoard b = add1ForLine <$> b
-
-add1ForLine :: Line -> Line
-add1ForLine l = add1ForCell <$> l
-
-add1ForCell :: Cell -> Cell
-add1ForCell c = c + 1
-
-type BoardState = (Int , Board)
+------
 
 type Board = [Line]
 type Line  = [Cell]
