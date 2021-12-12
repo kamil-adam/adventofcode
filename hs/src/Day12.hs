@@ -12,9 +12,9 @@ import qualified Data.List.Extra as L
 
 day12 :: IO ()
 day12 = do
-  t <- readFileText "input/i12"
---  content <- readFileText "input/in12"
---  content <- readFileText "input/input12"
+--  t <- readFileText "input/i12" --10 --36
+--  t <- readFileText "input/in12" --19 --103
+  t <- readFileText "input/input12" --3708
   putTextLn $ "day 10 " <> (show (run1 t))
 
 type Paths = [Path]
@@ -24,24 +24,41 @@ type CaveMap = Map Text [Text]
 --type ReturnA = [(Text , [Text])]
 --type Return = Int
 
-run1 :: Text -> CaveMap
-run1 t = Map.fromList $ bbb t
+run1 :: Text -> Int
+run1 t = length $ buildFromStart $ Map.fromList $ bbb t
 
 buildFromStart :: CaveMap -> Paths
 buildFromStart caveMap = build caveMap [] "start"
 
 --build :: Text -> Paths -> Paths -> CaveMap -> Paths
-build :: CaveMap ->  Path -> Text -> Paths
+build :: CaveMap -> Path -> Text -> Paths
 build caveMap current name
-  | name == T.toLower name && (elem name current) = []
+  | name == "start" && current /= [] = []
+  | isLower name && (2 <= smallCaveLen || (1 == smallCaveLen && finalCondition current)) = []
   | name == "end" = [current <> ["end"]]
   | otherwise     = paths
     where
+      smallCaveLen = smallCave current name
       paths = join $ ((build caveMap current') <$> names)
       names     = caveMap Map.! name
       current' = current <> [name]
 
+isLower :: Text -> Bool
+isLower t = t == T.toLower t
 
+
+smallCave :: Path -> Text -> Int
+smallCave current name = length (filter (\ e -> e == name) current)
+
+finalCondition :: Path -> Bool
+finalCondition current = 1 <= (length $ filter (\(k , v) -> isLower k && 2 <= v) (fff current))
+
+fff :: Path -> [(Text, Int)]
+fff current = (eee <$> (group $ sort current))
+
+eee :: [Text] -> (Text, Int)
+eee [] = error "ddd"
+eee l@(e : _) = (e, length l)
 
 
 
