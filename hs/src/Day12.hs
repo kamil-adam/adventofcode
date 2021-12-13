@@ -1,12 +1,12 @@
 module Day12 where
 
-import qualified Data.Map      as Map
-import qualified Data.Set      as Set
+import qualified Data.Map        as Map
+import qualified Data.Set        as Set
 
-import qualified Relude.Unsafe as Unsafe
+import qualified Relude.Unsafe   as Unsafe
 
 --import qualified Data.List as L
-import qualified Data.Text     as T
+import qualified Data.Text       as T
 
 import qualified Data.List.Extra as L
 
@@ -57,7 +57,7 @@ fff :: Path -> [(Text, Int)]
 fff current = (eee <$> (group $ sort current))
 
 eee :: [Text] -> (Text, Int)
-eee [] = error "ddd"
+eee []        = error "ddd"
 eee l@(e : _) = (e, length l)
 
 
