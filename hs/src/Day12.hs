@@ -5,74 +5,70 @@ import qualified Data.Set        as Set
 
 import qualified Relude.Unsafe   as Unsafe
 
---import qualified Data.List as L
+import qualified Data.List as L
 import qualified Data.Text       as T
 
-import qualified Data.List.Extra as L
+--import qualified Data.List.Extra as L
 
 day12 :: IO ()
 day12 = do
---  t <- readFileText "input/i12" --10 --36
+--  t <- readFileText "input/i12" --17
 --  t <- readFileText "input/in12" --19 --103
-  t <- readFileText "input/input12" --3708
-  putTextLn $ "day 10 " <> (show (run1 t))
+  t <- readFileText "input/input12" -- RGZLBHFP
+  putTextLn $ "day 10 \n" <>  (run1 t)
 
-type Paths = [Path]
-type Path = [Text]
+type Return = Int
+--type Return = [Point]
 
-type CaveMap = Map Text [Text]
---type ReturnA = [(Text , [Text])]
---type Return = Int
+  --fold along x=655
+  --fold along y=447
+  --fold along x=327
+  --fold along y=223
+  --fold along x=163
+  --fold along y=111
+  --fold along x=81
+  --fold along y=55
+  --fold along x=40
+  --fold along y=27
+  --fold along y=13
+  --fold along y=6
 
-run1 :: Text -> Int
-run1 t = length $ buildFromStart $ Map.fromList $ bbb t
+run1 :: Text -> Text
+run1 t = T.concat (ccc l n1 <$> [0 .. n2])
+ where
+   n1 = max1 l
+   n2 = max2 l
+   l = rmdups $ bbb (Right 6) <$> bbb (Right 13) <$> bbb (Right 27) <$> bbb (Left 40) <$> bbb (Right 55) <$> bbb (Left 81) <$> bbb (Right 111) <$> bbb (Left 163) <$> bbb (Right 223) <$> bbb (Left 327) <$> bbb (Right 447) <$> bbb (Left 655) <$> aaa <$> map readInt <$> T.splitOn "," <$> lines t
 
-buildFromStart :: CaveMap -> Paths
-buildFromStart caveMap = build caveMap [] "start"
+ccc :: [Point] -> Int -> Int -> Text
+ccc l n1 i2 = T.concat ((\ i1 -> eee l i1 i2) <$> [0 .. n1]) <> "\n"
 
---build :: Text -> Paths -> Paths -> CaveMap -> Paths
-build :: CaveMap -> Path -> Text -> Paths
-build caveMap current name
-  | name == "start" && current /= [] = []
-  | isLower name && (2 <= smallCaveLen || (1 == smallCaveLen && finalCondition current)) = []
-  | name == "end" = [current <> ["end"]]
-  | otherwise     = paths
-    where
-      smallCaveLen = smallCave current name
-      paths = join $ ((build caveMap current') <$> names)
-      names     = caveMap Map.! name
-      current' = current <> [name]
+eee :: [Point] -> Int -> Int -> Text
+eee l i1 i2
+  | elem (i1 , i2) l = "#"
+  | otherwise        = "."
 
-isLower :: Text -> Bool
-isLower t = t == T.toLower t
+max1 :: [Point] -> Int
+max1 l = L.maximum $ (\(i , _) -> i) <$> l
 
+max2 :: [Point] -> Int
+max2 l = L.maximum $ (\(_ , i) -> i) <$> l
 
-smallCave :: Path -> Text -> Int
-smallCave current name = length (filter (\ e -> e == name) current)
-
-finalCondition :: Path -> Bool
-finalCondition current = 1 <= (length $ filter (\(k , v) -> isLower k && 2 <= v) (fff current))
-
-fff :: Path -> [(Text, Int)]
-fff current = (eee <$> (group $ sort current))
-
-eee :: [Text] -> (Text, Int)
-eee []        = error "ddd"
-eee l@(e : _) = (e, length l)
+--ccc :: [Point] -> Map Int [Int]
+--ccc l = L.groupOn ( \(k , _) -> k)
 
 
+bbb :: Either Int Int -> Point -> Point
+bbb (Left n) (i1 , i2)
+  | n < i1    = (2 * n - i1 , i2)
+  | otherwise = (i1 , i2)
+bbb (Right n) (i1 , i2)
+  | n < i2    = (i1 , 2 * n - i2)
+  | otherwise = (i1 , i2)
 
-bbb :: Text -> [(Text , [Text])]
-bbb t = ccc <$> (L.groupOn (\ (k , _) -> k) $ sort $ aaa =<< (T.splitOn "-" <$> lines t))
---bbb t = ccc <$> (L.groupBy (\ (k1 , _) (k2 , _) -> k1 == k2) $ aaa =<< (T.splitOn "-" <$> lines t))
-
-ccc :: [(Text , Text)] -> (Text, [Text])
-ccc l@((k, _) : _) = (k , (\(_ , v) -> v) <$> l)
-ccc []             = error "ccc"
-
-aaa :: [Text] -> [(Text , Text)]
-aaa [a1 , a2] = [(a1 , a2) , (a2 , a1)]
-aaa  a        = error $ show a
+aaa :: [Int] -> Point
+aaa [i1 , i2] = (i1 , i2)
+aaa a         = error $ show a
 
 
 ------
