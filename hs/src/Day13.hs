@@ -1,12 +1,12 @@
 module Day13 where
 
-import qualified Data.Map        as Map
-import qualified Data.Set        as Set
+import qualified Data.Map      as Map
+import qualified Data.Set      as Set
 
-import qualified Relude.Unsafe   as Unsafe
+import qualified Relude.Unsafe as Unsafe
 
-import qualified Data.List as L
-import qualified Data.Text       as T
+import qualified Data.List     as L
+import qualified Data.Text     as T
 
 --import qualified Data.List.Extra as L
 
