@@ -10,8 +10,8 @@ import qualified Data.Text     as T
 
 import qualified Data.List.Extra as L
 
-day13 :: IO ()
-day13 = do
+day15:: IO ()
+day15 = do
 --  t <- readFileText "input/i15" -- NNCB
 --  t <- readFileText "input/i15" --17
 --  t <- readFileText "input/in15" --19 --103
