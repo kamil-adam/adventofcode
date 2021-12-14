@@ -5,72 +5,53 @@ import qualified Data.Set      as Set
 
 import qualified Relude.Unsafe as Unsafe
 
-import qualified Data.List     as L
+--import qualified Data.List     as L
 import qualified Data.Text     as T
 
---import qualified Data.List.Extra as L
+import qualified Data.List.Extra as L
 
 day13 :: IO ()
 day13 = do
---  t <- readFileText "input/i13" --17
+  t <- readFileText "input/i13" -- NNCB
 --  t <- readFileText "input/i13" --17
 --  t <- readFileText "input/in13" --19 --103
-  t <- readFileText "input/input13" -- RGZLBHFP
-  putTextLn $ "day 10 \n" <>  (run1 t)
+--  t <- readFileText "input/input13" -- SHPPPVOFPBFCHHBKBNCV
+  putStrLn $ "day 10 \n" <>  (run1 "NNCB" t)
+--  putStrLn $ "day 10 \n" <>  (run1 "SHPPPVOFPBFCHHBKBNCV" t)
 
 type Return = Int
---type Return = [Point]
 
-  --fold along x=655
-  --fold along y=447
-  --fold along x=327
-  --fold along y=223
-  --fold along x=163
-  --fold along y=111
-  --fold along x=81
-  --fold along y=55
-  --fold along x=40
-  --fold along y=27
-  --fold along y=13
-  --fold along y=6
+run1 :: Text -> Text -> String
+run1 start t = step 10 (toString start) (buildMatchMap t)
 
-run1 :: Text -> Text
-run1 t = T.concat (ccc l n1 <$> [0 .. n2])
- where
-   n1 = max1 l
-   n2 = max2 l
-   l = rmdups $ bbb (Right 6) <$> bbb (Right 13) <$> bbb (Right 27) <$> bbb (Left 40) <$> bbb (Right 55) <$> bbb (Left 81) <$> bbb (Right 111) <$> bbb (Left 163) <$> bbb (Right 223) <$> bbb (Left 327) <$> bbb (Right 447) <$> bbb (Left 655) <$> aaa <$> map readInt <$> T.splitOn "," <$> lines t
+step :: Int -> String -> MatchMap -> String
+step 0 s _        = s
+step i s matchMap = step (i - 1) s' matchMap
+  where s' = nextState matchMap s
 
-ccc :: [Point] -> Int -> Int -> Text
-ccc l n1 i2 = T.concat ((\ i1 -> eee l i1 i2) <$> [0 .. n1]) <> "\n"
+nextState :: MatchMap -> String -> String
+nextState _                 [] = []
+nextState _                [c] = [c]
+nextState matchMap (c1: c2: s) = c1 : (match2chars matchMap c1 c2) : (nextState matchMap (c2:s))
 
-eee :: [Point] -> Int -> Int -> Text
-eee l i1 i2
-  | elem (i1 , i2) l = "#"
-  | otherwise        = "."
+buildMatchMap :: Text -> MatchMap
+buildMatchMap t = buildMap <$> (buildMap $ buildMatchMap' <$> T.splitOn " -> " <$> lines t)
 
-max1 :: [Point] -> Int
-max1 l = L.maximum $ (\(i , _) -> i) <$> l
+buildMap :: (Ord k , Ord v) => [(k , v)] -> Map k [v]
+buildMap l = Map.fromList (aaa <$> (L.groupOn (\(k , _) -> k) $ sort l))
 
-max2 :: [Point] -> Int
-max2 l = L.maximum $ (\(_ , i) -> i) <$> l
+aaa :: [(k , v)] -> (k , [v])
+aaa [] = error "aaa"
+aaa l@((k , _) : _) = (k, (snd <$> l))
 
---ccc :: [Point] -> Map Int [Int]
---ccc l = L.groupOn ( \(k , _) -> k)
+buildMatchMap' :: [Text] -> (Char , (Char , Char))
+buildMatchMap' [t1 , t2] = (T.index t1 0 , (T.index t1 1 , T.index t2 0))
+buildMatchMap' other     = error $ show other
 
+type MatchMap = Map Char (Map Char [Char])
 
-bbb :: Either Int Int -> Point -> Point
-bbb (Left n) (i1 , i2)
-  | n < i1    = (2 * n - i1 , i2)
-  | otherwise = (i1 , i2)
-bbb (Right n) (i1 , i2)
-  | n < i2    = (i1 , 2 * n - i2)
-  | otherwise = (i1 , i2)
-
-aaa :: [Int] -> Point
-aaa [i1 , i2] = (i1 , i2)
-aaa a         = error $ show a
-
+match2chars :: MatchMap -> Char -> Char -> Char
+match2chars matchMap c1 c2 = ((matchMap Map.! c1) Map.! c2) Unsafe.!! 0
 
 ------
 
