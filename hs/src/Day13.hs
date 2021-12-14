@@ -12,17 +12,25 @@ import qualified Data.List.Extra as L
 
 day13 :: IO ()
 day13 = do
-  t <- readFileText "input/i13" -- NNCB
+--  t <- readFileText "input/i13" -- NNCB
 --  t <- readFileText "input/i13" --17
 --  t <- readFileText "input/in13" --19 --103
---  t <- readFileText "input/input13" -- SHPPPVOFPBFCHHBKBNCV
-  putStrLn $ "day 10 \n" <>  (run1 "NNCB" t)
---  putStrLn $ "day 10 \n" <>  (run1 "SHPPPVOFPBFCHHBKBNCV" t)
+  t <- readFileText "input/input13" -- SHPPPVOFPBFCHHBKBNCV
+--  putTextLn $ "day 10 \n" <> (show $ (run1 "NNCB" t))
+  putTextLn $ "day 10 \n" <> (show $ (run1 "SHPPPVOFPBFCHHBKBNCV" t))
 
 type Return = Int
 
-run1 :: Text -> Text -> String
-run1 start t = step 10 (toString start) (buildMatchMap t)
+run1 :: Text -> Text -> Int
+run1 start t = count $ step 10 (toString start) (buildMatchMap t)
+
+count :: (Ord a ) => [a] -> Int
+count l = count' $ sort (length <$> sortAndGroup l)
+
+count' :: [Int] -> Int
+--count' l = (Unsafe.last l)
+--count' l = (Unsafe.last l) - (Unsafe.head l)
+count' l = (Unsafe.head l) - (Unsafe.last l)
 
 step :: Int -> String -> MatchMap -> String
 step 0 s _        = s
@@ -52,6 +60,9 @@ type MatchMap = Map Char (Map Char [Char])
 
 match2chars :: MatchMap -> Char -> Char -> Char
 match2chars matchMap c1 c2 = ((matchMap Map.! c1) Map.! c2) Unsafe.!! 0
+
+sortAndGroup :: (Ord a) => [a] -> [[a]]
+sortAndGroup = group . sort
 
 ------
 
