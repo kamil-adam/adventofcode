@@ -16,10 +16,40 @@ day13 = do
 --  t <- readFileText "input/i13" --17
 --  t <- readFileText "input/in13" --19 --103
   t <- readFileText "input/input13" -- SHPPPVOFPBFCHHBKBNCV
---  putTextLn $ "day 10 \n" <> (show $ (run1 "NNCB" t))
-  putTextLn $ "day 10 \n" <> (show $ (run1 "SHPPPVOFPBFCHHBKBNCV" t))
+--  putTextLn $ "day 13 \n" <> (show $ (run1 "NNCB" t))
+  putTextLn $ "day 13 \n" <> (show $ (run2 "SHPPPVOFPBFCHHBKBNCV" t))
 
 type Return = Int
+
+run2 :: Text -> Text -> Int
+run2 start t = count $ Map.toList $ step2 4 (buildStateMap $ toString start) (buildMatchMap t)
+
+step2 :: Int -> StateMap -> MatchMap -> StateMap
+step2 0 s _        = s
+step2 i s matchMap = step2 (i - 0)  s' matchMap
+  where s' = nextState2 matchMap s
+
+nextState2 :: MatchMap -> StateMap -> StateMap
+nextState2 matchMap s = Map.map sum (buildMap $ concat (nextState2' matchMap <$> (Map.toList s)))
+
+nextState2' :: MatchMap -> CharPairWithCount -> [CharPairWithCount]
+nextState2' matchMap ((c1 , c2) , i) = [((c1 , c), i) , ((c , c2), i)]
+ where c = match2chars matchMap c1 c2
+
+buildStateMap :: String -> StateMap
+buildStateMap s = Map.fromList $ sortGroupAndCount $ buildStateMap' s
+
+buildStateMap' :: String -> [CharPair]
+buildStateMap' [] = []
+buildStateMap' [_] = []
+buildStateMap' (c1 : c2 : s) = (c1 , c2) : (buildStateMap' (c2 : s))
+
+
+type StateMap = Map CharPair Int
+
+type CharPairWithCount = (CharPair , Int)
+
+type CharPair = (Char , Char)
 
 run1 :: Text -> Text -> Int
 run1 start t = count $ step 10 (toString start) (buildMatchMap t)
@@ -28,9 +58,7 @@ count :: (Ord a ) => [a] -> Int
 count l = count' $ sort (length <$> sortAndGroup l)
 
 count' :: [Int] -> Int
---count' l = (Unsafe.last l)
---count' l = (Unsafe.last l) - (Unsafe.head l)
-count' l = (Unsafe.head l) - (Unsafe.last l)
+count' l = (Unsafe.last l) - (Unsafe.head l)
 
 step :: Int -> String -> MatchMap -> String
 step 0 s _        = s
@@ -61,6 +89,13 @@ type MatchMap = Map Char (Map Char [Char])
 match2chars :: MatchMap -> Char -> Char -> Char
 match2chars matchMap c1 c2 = ((matchMap Map.! c1) Map.! c2) Unsafe.!! 0
 
+sortGroupAndCount :: (Ord a) => [a] -> [(a , Int)]
+sortGroupAndCount l = countDuplicates <$> sortAndGroup l
+
+countDuplicates :: [a] -> (a , Int)
+countDuplicates      [] = error "countL"
+countDuplicates l@(h:_) = (h, length l)
+
 sortAndGroup :: (Ord a) => [a] -> [[a]]
 sortAndGroup = group . sort
 
@@ -72,69 +107,13 @@ type Cell = Int
 
 --------
 
-check2 :: Char -> Int
-check2 ')' = 1
-check2 ']' = 2
-check2 '}' = 3
-check2 '>' = 4
-check2  c  = error $ show c
-
 middle :: [a] -> a
 middle l = l Unsafe.!! (((length l) `div` 2))
-
--- 2441
--- )}>]}) = ((((((1 * 5 + 3) * 5 + 4) * 5) + 2) * 5) +  3) * 5 + 1
-
-------
-
---type Return = [Maybe Int]
---type Return = Int
 
 ------
 
 rmdups :: (Ord a) => [a] -> [a]
 rmdups = map Unsafe.head . group . sort
-
-findCells :: Matrix -> Point -> Point -> [Point]
-findCells m n i = findCells2 m n i $ getCell m i
-
-findCells2 :: Matrix -> Point -> Point -> Int -> [Point]
-findCells2 m n i@(i1 , i2) v
-  | 9 == v = []
---  | otherwise = i : (catMaybes $ [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)])
-  | otherwise = i : (findCells m n =<< (filter (\i' -> checkCell9 v (getCell m i')) $ catMaybes $ [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)]))
-
-checkCell9 :: Int -> Int -> Bool
-checkCell9 v v' = v < v' && v' < 9
-
-minimums :: Matrix -> Point -> [Int] -> [Int] -> [Point]
-minimums m n l1 l2 = catMaybes $ ddd m n l1 l2
-
-ddd :: Matrix -> Point -> [Int] -> [Int] -> [Maybe Point]
-ddd m n l1 l2 = do
-  i1 <- l1
-  i2 <- l2
-  pure $ checkCell m n (i1 , i2)
-
-checkCell :: Matrix -> Point -> Point -> Maybe Point
-checkCell m n i@(i1 , i2) = compareCells m i [maybePoint m n (i1-1 , i2) , maybePoint m n (i1 , i2-1) , maybePoint m n (i1 , i2+1) , maybePoint m n (i1+1 , i2)]
-
-compareCells :: Matrix -> Point -> [Maybe Point] -> Maybe Point
-compareCells m p l
-  | all (compareCell m p) l = Just $ p
-  | otherwise = Nothing
-
-compareCell :: Matrix -> Point -> Maybe Point -> Bool
-compareCell m p (Just p') = getCell m p < getCell m p'
-compareCell _ _  Nothing  = True
-
-maybePoint :: Matrix -> Point -> Point -> Maybe Point
-maybePoint _ (n1, n2) i@(i1, i2)
-  | 0 <= i1 && 0 <= i2 && i1 <= n1 && i2 <= n2 = Just i
-  | otherwise = Nothing
-
-getCell :: Matrix -> Point -> Int
-getCell m (y , x) = (m Unsafe.!! y) Unsafe.!! x
 
 type Matrix = [[Int]]
 type Unvisited  = [[Bool]]
@@ -171,11 +150,6 @@ contestText' t2 t1 = Set.size $ Set.intersection (textToCharSet t1) (textToCharS
 textToCharSet :: Text -> Set Char
 textToCharSet t = fromList $ toString t
 
-findSimple :: [Text] -> Map Int Text
-findSimple t = fromList [findPattern 1 2 t , findPattern 7 3 t , findPattern 4 4 t , findPattern 8 7 t]
-
-findPattern :: Int -> Int -> [Text] -> (Int, Text)
-findPattern i s l = (i , getMaybe $ find (\e -> T.length e == s) l)
 
 getMaybe :: Maybe a -> a
 getMaybe (Just a) = a
