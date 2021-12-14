@@ -16,17 +16,29 @@ day13 = do
 --  t <- readFileText "input/i13" --17
 --  t <- readFileText "input/in13" --19 --103
   t <- readFileText "input/input13" -- SHPPPVOFPBFCHHBKBNCV
---  putTextLn $ "day 13 \n" <> (show $ (run1 "NNCB" t))
-  putTextLn $ "day 13 \n" <> (show $ (run2 "SHPPPVOFPBFCHHBKBNCV" t))
+--  putTextLn $ "day 14 \n" <> (show $ (run2 "NNCB" t))
+--  putTextLn $ "day 14 \n" <> (show $ (run2 "SHPPPVOFPBFCHHBKBNCV" t))
+  putTextLn $ "day 14 \n" <> (show $ (run2 "SHPPPVOFPBFCHHBKBNCV" t))
 
 type Return = Int
+--type Return = StateMap
+--type Return = [(CharPair, Int)]
+--type Return = [Int]
+--type Return = [(Char, Int)]
+--type Return = Map Char Int
 
-run2 :: Text -> Text -> Int
-run2 start t = count $ Map.toList $ step2 4 (buildStateMap $ toString start) (buildMatchMap t)
+run2 :: Text -> Text -> Return
+--run2 start t = count $ Map.toList $ step2 40 (buildStateMap $ toString start) (buildMatchMap t)
+run2 start t = count' $ sort $ snd <$> correctLast <$> Map.toList (Map.map sum $ buildMap $ ((\ ((c1 , _), i ) -> (c1, i)) <$> (Map.toList $ step2 40 (buildStateMap $ toString start) (buildMatchMap t))))
+
+correctLast :: (Char , Int) -> (Char , Int)
+correctLast ('V' , i) = ('V' , i +1)
+correctLast a         = a
+
 
 step2 :: Int -> StateMap -> MatchMap -> StateMap
 step2 0 s _        = s
-step2 i s matchMap = step2 (i - 0)  s' matchMap
+step2 i s matchMap = step2 (i - 1)  s' matchMap
   where s' = nextState2 matchMap s
 
 nextState2 :: MatchMap -> StateMap -> StateMap
