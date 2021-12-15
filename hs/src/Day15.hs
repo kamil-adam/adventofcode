@@ -12,10 +12,10 @@ import qualified Data.List.Extra as L
 
 day15:: IO ()
 day15 = do
-  t <- readFileText "input/i15"
+--  t <- readFileText "input/i15"
 --  t <- readFileText "input/i15" --17
 --  t <- readFileText "input/in15" --19 --103
---  t <- readFileText "input/input15"
+  t <- readFileText "input/input15"
   putTextLn $ "day 15 \n" <> (show $ (run11 t))
 
 type Return = Int
@@ -29,16 +29,23 @@ type Return1 = [(Point, Int)]
 type Result1 = [(Point , Int)]
 
 --run11:: Text -> Return1
---run11 :: Text -> [[(Point, Int)]]
+--run11 :: Text -> [(Point, Int)]
+run11 :: Text -> Int
 --run11 t = L.minimum $ start1 $ map readIntFromChar <$> toString <$> lines t
 --run11 t =  bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1 $ map readIntFromChar <$> toString <$> lines t)
 --run11 t =  bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1end $ map readIntFromChar <$> toString <$> lines t)
 --run11 t = bbb sum <$> aaa <$> sortGroupOn (fst) $ (startLine <> endLine)
-run11 t = sortGroupOn (fst) $ (startLine <> endLine)
+run11 t =  L.minimum (snd <$> (bbb sum <$> grouped))
   where
+    grouped   = aaa <$> (sortGroupOn (fst) $ (line))
+    line      = startLine <> endLine
     startLine = bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1 b)
     endLine   = bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1end b)
     b = map readIntFromChar <$> toString <$> lines t
+
+--ccc :: [(Point, Int)]-> (Point, [Int])
+--ccc = aaa
+
 
 start1end :: Board -> Result1
 start1end b = step1end 0 pe end b where
