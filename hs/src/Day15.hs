@@ -12,11 +12,65 @@ import qualified Data.List.Extra as L
 
 day15:: IO ()
 day15 = do
---  t <- readFileText "input/i15"
+  t <- readFileText "input/i15"
 --  t <- readFileText "input/i15" --17
 --  t <- readFileText "input/in15" --19 --103
-  t <- readFileText "input/input15"
-  putTextLn $ "day 15 \n" <> (show $ (run11 t))
+--  t <- readFileText "input/input15"
+  putTextLn $ "day 15 \n" <> (show $ (run12 t))
+
+type Return12 = Int
+
+type Result12 = [Int]
+
+run12 :: Text -> Board
+run12 t = start12 b
+  where
+        b = map readIntFromChar <$> toString <$> lines t
+
+start12 :: Board -> Board
+start12 b = step12Line p0 b result  where
+  p0 = (0, 0)
+  result = replicate n $ replicate n $ (maxBound :: Int)
+  n = length b
+
+step12Line :: Point -> Board -> Board -> Board
+step12Line (i1 , i2) b result
+  | i1 < length b = step12Line (i1 + 1, i2) b (step12 (i1, 0) b result)
+  | otherwise     = result
+
+
+step12 :: Point -> Board -> Board -> Board
+step12  p@(i1 , i2) b result
+  | i2 <= i1  = step12  (i1 , i2 + 1) b result'
+  | otherwise = result'
+    where
+      result' :: Board
+      result' = setPointInBoard result p value
+      value :: Int
+      value = (valuePointIf0 b (i1, i2)) + parentValue
+      parentValue =  L.minimum [(valuePointIf0 result (i1 - 1, i2)), (valuePointIf0 result (i1, i2 - 1))]
+
+
+setPointInBoard :: Board -> Point -> Int -> Board
+setPointInBoard b p v = setPointInLine p v <$> (zip b [0 ..])
+
+setPointInLine :: Point -> Int -> (Line , Int) -> Line
+setPointInLine (i1 , i2) v (l , i)
+  | i1 == i   = (setPointInCell i2 v) <$> lineWithIndex
+  | otherwise = l
+    where
+      lineWithIndex :: [(Cell, Int)]
+      lineWithIndex = zip l [0 ..]
+
+setPointInCell :: Cell -> Int -> (Int , Int) -> Int
+setPointInCell i2 v (cell , i)
+  | i2 == i   = v
+  | otherwise = cell
+
+valuePointIf0 :: Board -> Point -> Int
+valuePointIf0 b p@(i1 , i2)
+  | 0 < (i1 - 1) && 0 < (i2 - 1) = valuePoint b p
+  | otherwise                    = 0
 
 type Return = Int
 --type Return = [Int]
