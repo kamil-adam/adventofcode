@@ -1,12 +1,12 @@
 module Day15 where
 
-import qualified Data.Map      as Map
-import qualified Data.Set      as Set
+import qualified Data.Map        as Map
+import qualified Data.Set        as Set
 
-import qualified Relude.Unsafe as Unsafe
+import qualified Relude.Unsafe   as Unsafe
 
 --import qualified Data.List     as L
-import qualified Data.Text     as T
+import qualified Data.Text       as T
 
 import qualified Data.List.Extra as L
 
@@ -52,8 +52,8 @@ buildStateMap :: String -> StateMap
 buildStateMap s = Map.fromList $ sortGroupAndCount $ buildStateMap' s
 
 buildStateMap' :: String -> [CharPair]
-buildStateMap' [] = []
-buildStateMap' [_] = []
+buildStateMap' []            = []
+buildStateMap' [_]           = []
 buildStateMap' (c1 : c2 : s) = (c1 , c2) : (buildStateMap' (c2 : s))
 
 
@@ -89,7 +89,7 @@ buildMap :: (Ord k , Ord v) => [(k , v)] -> Map k [v]
 buildMap l = Map.fromList (aaa <$> (L.groupOn (\(k , _) -> k) $ sort l))
 
 aaa :: [(k , v)] -> (k , [v])
-aaa [] = error "aaa"
+aaa []              = error "aaa"
 aaa l@((k , _) : _) = (k, (snd <$> l))
 
 buildMatchMap' :: [Text] -> (Char , (Char , Char))
