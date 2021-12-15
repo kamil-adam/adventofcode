@@ -8,19 +8,71 @@ import qualified Relude.Unsafe   as Unsafe
 import qualified Data.List     as L
 import qualified Data.Text       as T
 
---import qualified Data.List.Extra as L
+import qualified Data.List.Extra as L
 
 day15:: IO ()
 day15 = do
-  t <- readFileText "input/i15" -- NNCB
+  t <- readFileText "input/i15"
 --  t <- readFileText "input/i15" --17
 --  t <- readFileText "input/in15" --19 --103
---  t <- readFileText "input/input15" -- SHPPPVOFPBFCHHBKBNCV
-  putTextLn $ "day 15 \n" <> (show $ (run1 t))
+--  t <- readFileText "input/input15"
+  putTextLn $ "day 15 \n" <> (show $ (run11 t))
 
 type Return = Int
 --type Return = [Int]
 --type Return = Board
+
+--type Return1 = [[(Point, Int)]]
+--type Return1 = [(Point, [Int])]
+type Return1 = [(Point, Int)]
+
+type Result1 = [(Point , Int)]
+
+--run11:: Text -> Return1
+--run11 :: Text -> [[(Point, Int)]]
+--run11 t = L.minimum $ start1 $ map readIntFromChar <$> toString <$> lines t
+--run11 t =  bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1 $ map readIntFromChar <$> toString <$> lines t)
+--run11 t =  bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1end $ map readIntFromChar <$> toString <$> lines t)
+--run11 t = bbb sum <$> aaa <$> sortGroupOn (fst) $ (startLine <> endLine)
+run11 t = sortGroupOn (fst) $ (startLine <> endLine)
+  where
+    startLine = bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1 b)
+    endLine   = bbb L.minimum <$> aaa <$> (sortGroupOn (fst) $ start1end b)
+    b = map readIntFromChar <$> toString <$> lines t
+
+start1end :: Board -> Result1
+start1end b = step1end 0 pe end b where
+  end = (length b) - 1
+  pe  = ((length b) - 1, (length (Unsafe.head b)) - 1)
+
+step1end :: Int -> Point -> Int -> Board -> Result1
+step1end s p@(i1 , i2) end b
+  | i1 + i2 <= end   = [(p , s)]
+  | 0 < i1 && 0 < i2 = (step1end s' (i1 - 1 , i2) end b) <> (step1end s' (i1 , i2 - 1) end b)
+  | 0 < i1           = (step1end s' (i1 - 1 , i2) end b)
+  | 0 < i2           = (step1end s' (i1 , i2 - 1) end b)
+  | otherwise        = [(p , s)]
+    where
+      s' = s + v
+      v = valuePoint b p
+
+start1 :: Board -> Result1
+start1 b = step1 0 (0, 0) end pe b where
+  pe  = ((length b) - 1, (length (Unsafe.head b)) - 1)
+  end = (length b) - 1
+
+
+
+step1 :: Int -> Point -> Int -> Point -> Board -> Result1
+step1 s p@(i1 , i2) end pe@(e1 , e2) b
+  | end <= i1 + i2      = [(p , s)]
+  | i1 < e1 && i2 < e2 = (step1 s' (i1 + 1 , i2) end pe b) <> (step1 s' (i1 , i2 + 1) end pe b)
+  | i1 < e1            = (step1 s' (i1 + 1 , i2) end pe b)
+  | i2 < e2            = (step1 s' (i1 , i2 + 1) end pe b)
+  | otherwise          = [(p , s)]
+    where
+      s' = s + v
+      v = valuePoint b p
 
 run1 :: Text -> Return
 run1 t = L.minimum $ start $ map readIntFromChar <$> toString <$> lines t
@@ -38,11 +90,19 @@ step s p@(i1 , i2) pe@(e1 , e2) b
       s' = s + v
       v = valuePoint b p
 
+bbb :: ([v] -> v) -> (k, [v]) -> (k, v)
+bbb f (k, vs) = (k , f vs)
+
+aaa :: [(k, v)] -> (k, [v])
+aaa l@((k, _): _) = (k , snd <$> l)
+aaa [] = error "aaa"
+
+
 valuePoint :: Board -> Point -> Int
 valuePoint b (i1 , i2) = (b Unsafe.!! i1) Unsafe.!! i2
 
-
-
+sortGroupOn :: (Ord a, Eq b) => (a -> b) -> [a] -> [[a]]
+sortGroupOn f = L.groupOn f. sort
 
 sortGroupAndCount :: (Ord a) => [a] -> [(a , Int)]
 sortGroupAndCount l = countDuplicates <$> sortAndGroup l
