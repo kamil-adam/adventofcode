@@ -23,9 +23,27 @@ type Return12 = Int
 type Result12 = [Int]
 
 run12 :: Text -> Board
-run12 t = start12 b
+run12 t = start12 $ repeatBoard5 b
   where
         b = map readIntFromChar <$> toString <$> lines t
+
+repeatBoard5 :: Board -> Board
+repeatBoard5 b = repeatBoard b =<< [0..4]
+
+repeatBoard :: Board -> Int -> Board
+repeatBoard b i = replaceLine5 i <$> b
+
+replaceLine5 :: Int -> Line -> Line
+replaceLine5 offset l = (replaceLine offset l) =<< [0..4]
+
+replaceLine :: Int -> Line -> Int -> Line
+replaceLine offset l i = add9 (offset + i) <$> l
+
+add9 :: Int -> Int -> Int
+add9 e i
+  | s <= 9 = s
+  | otherwise = s - 9
+    where s = e + i
 
 start12 :: Board -> Board
 start12 b = step12Line p0 b result  where
