@@ -12,10 +12,10 @@ import qualified Data.List.Extra as L
 
 day15:: IO ()
 day15 = do
---  t <- readFileText "input/i15"
+--  t <- readFileText "input/i15" -- 315
 --  t <- readFileText "input/i15" --17
 --  t <- readFileText "input/in15" --19 --103
-  t <- readFileText "input/input15"
+  t <- readFileText "input/input15" -- 2917
   putTextLn $ "day 15 \n" <> (show $ (run12 t))
 
 type Return12 = Int
@@ -40,10 +40,10 @@ replaceLine :: Int -> Line -> Int -> Line
 replaceLine offset l i = add9 (offset + i) <$> l
 
 add9 :: Int -> Int -> Int
-add9 e i
-  | s <= 9 = s
-  | otherwise = s - 9
+add9 e i = ((s - 1) `mod` 9) + 1
     where s = e + i
+
+--- modWithOffset s offset = (mod (s - offset)) + offset
 
 start12 :: Board -> Board
 start12 b = step12Line p0 b result  where
